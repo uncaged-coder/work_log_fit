@@ -7,10 +7,7 @@ class WorkLogFitApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'WorkLogFit',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: ThemeData.dark(), // Apply the dark theme
       home: ProgramsListScreen(),
     );
   }
@@ -104,3 +101,4 @@ class ExerciseLogScreen extends StatelessWidget {
     );
   }
 }
+
