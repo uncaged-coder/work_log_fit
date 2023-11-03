@@ -1,104 +1,54 @@
+import 'dart:io' show Platform, Directory;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:work_log_fit/models/program.dart';
+import 'package:work_log_fit/models/exercise.dart';
+import 'package:work_log_fit/models/work_log_entry.dart';
+import 'screens/programs_list_screen.dart';
 
-void main() => runApp(WorkLogFitApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Set the path for Hive based on the platform
+  if (kIsWeb) {
+    Hive.init('');
+  } else if (Platform.isLinux) {
+    // For Linux, set the path according to XDG Base Directory Specification
+    String homeDirectory = Platform.environment['HOME'] ?? '/home/username';
+    String hiveDirectory = '$homeDirectory/.local/share/work_log_fit/hive';
+    Hive.init(hiveDirectory);
+  } else {
+    // For other platforms, use the path provided by path_provider
+    final appDocumentDir = await getApplicationDocumentsDirectory();
+    Hive.init(appDocumentDir.path);
+  }
+
+  Hive.registerAdapter(ProgramAdapter());
+  Hive.registerAdapter(ExerciseAdapter());
+  Hive.registerAdapter(WorkLogEntryAdapter());
+  await Hive.openBox('programs');
+  printHivePath();
+
+  runApp(WorkLogFitApp());
+}
+
+void printHivePath() {
+  if (Hive.isBoxOpen('programs')) {
+    print('Hive programs box path: ${Hive.box('programs').path}');
+  }
+}
 
 class WorkLogFitApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'WorkLogFit',
-      theme: ThemeData.dark(), // Apply the dark theme
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Color.fromRGBO(60, 0, 128, 1),
+      ),
       home: ProgramsListScreen(),
     );
   }
 }
-
-class ProgramsListScreen extends StatelessWidget {
-  final List<String> programs = ["Lafay", "Gym - legs", "Gym High body"];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Work Log Fit - Programs'),
-      ),
-      body: ListView.builder(
-        itemCount: programs.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(programs[index]),
-            onTap: () {
-              // Navigate to the exercises screen for the selected program
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ExercisesListScreen(programName: programs[index]),
-                ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add a new program (this can be updated to show a form in the future)
-        },
-        child: Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class ExercisesListScreen extends StatelessWidget {
-  final String programName;
-
-  // Dummy exercises data for demonstration
-  final List<String> exercises = ["Exercise 1", "Exercise 2", "Exercise 3"];
-
-  ExercisesListScreen({required this.programName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Exercises for $programName'),
-      ),
-      body: ListView.builder(
-        itemCount: exercises.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(exercises[index]),
-            onTap: () {
-              // Navigate to the logs screen for the selected exercise
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ExerciseLogScreen(exerciseName: exercises[index]),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class ExerciseLogScreen extends StatelessWidget {
-  final String exerciseName;
-
-  ExerciseLogScreen({required this.exerciseName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Logs for $exerciseName'),
-      ),
-      body: Center(
-        child: Text('Here you can view and add logs for $exerciseName'),
-      ),
-    );
-  }
-}
-

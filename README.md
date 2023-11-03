@@ -1,16 +1,5 @@
-# project
+# Work Log Fit
 
-A new Flutter project.
+Work Log Fit is an application primarily designed for Android devices, although it should function on other platforms as well. It assists users in logging their weight training sessions at the gym. When I couldn't find an open-source application that met my requirements, I decided to learn Dart and Flutter to create my own. There is potential for code refinement, but the application remains straightforward in its current form.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This project is distributed under the MIT license.

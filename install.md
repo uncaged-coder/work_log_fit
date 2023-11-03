@@ -27,6 +27,8 @@ source ~/.bashrc
 Verify the Flutter installation:
 flutter doctor
 
+If flutter report missing things from android SDK, then check step 5.
+
 # 3. Enable Desktop Support
 
 Navigate to the flutter directory
@@ -43,7 +45,6 @@ flutter config --enable-linux-desktop
 
 # 4. Create and Run Your App
 
-
 Create a new Flutter project:
 flutter create my_app
 
@@ -52,3 +53,21 @@ cd my_app
 
 Run your application:
 flutter run -d linux
+
+# 5. Install android studio
+
+download and install it from [official web site](https://developer.android.com/studio)
+follow the instruction and run it
+> /opt/android-studio/bin/studio.sh
+then
+> sudo apt install sdkmanager
+> sdkmanager --install "cmdline-tools;latest"
+
+then setup your environement. In my case, I use fish. So I have in ~/.config/fish/config.fish:
+
+set -gx ANDROID_SDK_ROOT /opt/android-sdk/
+set -gx CHROME_EXECUTABLE /usr/bin/chromium
+set -gx PATH $PATH /opt/flutter/bin /opt/android-sdk/cmdline-tools/latest/bin/
+
+check that flutter is happy:
+> flutter doctor -v

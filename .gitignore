@@ -39,6 +39,7 @@ linux/
 ios/
 android/
 web/
+*.g.dart
 
 # Symbolication related
 app.*.symbols
@@ -56,4 +57,3 @@ app.*.map.json
 /android//keystore.jks
 
 # Temporary Files created by dart2js
-**/lib/generated_plugin_registrant.dart
