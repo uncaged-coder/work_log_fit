@@ -118,8 +118,8 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
           Expanded(
             child: Row(
               children: [
-                numberButton('0', type),
                 deleteButton(type),
+                numberButton('0', type),
               ],
             ),
           ),
@@ -159,6 +159,21 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
+                  // Cancel functionality
+                  onPressed: () {
+                    // Simply pop the screen without saving anything
+                    Navigator.pop(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15.0, horizontal: 30.0),
+                    child: Text('Cancel', style: TextStyle(fontSize: 24)),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red, // Cancel button color
+                  ),
+                ),
+                ElevatedButton(
                   // Save functionality
                   onPressed: () {
                     final workLog = WorkLogEntry(
@@ -176,21 +191,6 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                   ),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.green, // Save button color
-                  ),
-                ),
-                ElevatedButton(
-                  // Cancel functionality
-                  onPressed: () {
-                    // Simply pop the screen without saving anything
-                    Navigator.pop(context);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15.0, horizontal: 30.0),
-                    child: Text('Cancel', style: TextStyle(fontSize: 24)),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // Cancel button color
                   ),
                 ),
               ],

@@ -11,9 +11,12 @@ class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
 
   ExerciseLogScreen({required this.exercise})
       : super(
-            title: 'Work Log Fit - Exercice',
-            boxName: 'workLog',
-            emptyList: 'No logs available - please add a new log.');
+          title: '${exercise.name} log',
+          boxName: 'workLog',
+          emptyList: 'No logs available - please add a new log.',
+          extraButtonName: 'Stats',
+          extraButtonIcon: 'Monitoring',
+        );
 
   @override
   _ExerciseLogScreenState createState() => _ExerciseLogScreenState(exercise);

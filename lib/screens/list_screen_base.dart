@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-const brightPurple = Color.fromRGBO(60, 0, 128, 1);
-const brightPurple2 = Color.fromRGBO(191, 64, 191, 1);
+const brightPurple = Color.fromRGBO(15, 59, 42, 1);
+const brightPurple2 = Color.fromRGBO(80, 200, 120, 1);
 
 abstract class BaseListScreen<T> extends StatefulWidget {
   final String title;
   final String boxName;
   final String emptyList;
+  final String extraButtonName;
+  final String extraButtonIcon;
 
-  BaseListScreen(
-      {required this.title, required this.boxName, required this.emptyList});
+  BaseListScreen({
+    required this.title,
+    required this.boxName,
+    required this.emptyList,
+    required this.extraButtonName,
+    required this.extraButtonIcon,
+  });
 
   @override
   State<BaseListScreen<T>> createState();
@@ -131,6 +138,17 @@ abstract class BaseListScreenState<T extends HiveObject>
     }).toList();
   }
 
+  IconData _getIconFromString(String iconName) {
+    switch (iconName) {
+      case 'Settings':
+        return Icons.settings;
+      case 'Monitoring':
+        return Icons.show_chart;
+      default:
+        return Icons.error;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> itemList = buildItemList(context);
@@ -146,8 +164,8 @@ abstract class BaseListScreenState<T extends HiveObject>
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.storage),
-            label: 'Home',
+            icon: Icon(_getIconFromString(widget.extraButtonIcon)),
+            label: widget.extraButtonName,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.delete),

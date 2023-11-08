@@ -6,9 +6,12 @@ import 'list_screen_base.dart';
 class ExerciseListScreen extends BaseListScreen<Exercise> {
   ExerciseListScreen()
       : super(
-            title: 'Work Log Fit - Exercices',
-            boxName: 'exercices',
-            emptyList: 'No exercices available. Please add a new exercice.');
+          title: 'Work Log Fit - Exercices',
+          boxName: 'exercices',
+          emptyList: 'No exercices available. Please add a new exercice.',
+          extraButtonName: 'Settings',
+          extraButtonIcon: 'Settings',
+        );
 
   @override
   _ExerciseListScreenState createState() => _ExerciseListScreenState();

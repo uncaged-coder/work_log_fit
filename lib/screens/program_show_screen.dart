@@ -12,9 +12,12 @@ class ProgramShowScreen extends BaseListScreen<Exercise> {
 
   ProgramShowScreen({required this.program})
       : super(
-            title: 'Work Log Fit - Program',
-            boxName: 'program',
-            emptyList: 'No exercices available - please add a new exercise.');
+          title: '${program.name} program',
+          boxName: 'program',
+          emptyList: 'No exercices available - please add a new exercise.',
+          extraButtonName: 'Settings',
+          extraButtonIcon: 'Settings',
+        );
 
   @override
   _ProgramShowScreenState createState() => _ProgramShowScreenState(program);

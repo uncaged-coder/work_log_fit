@@ -6,9 +6,12 @@ import 'list_screen_base.dart';
 class ProgramsListScreen extends BaseListScreen<Program> {
   ProgramsListScreen()
       : super(
-            title: 'Work Log Fit - Programs',
-            boxName: 'programs',
-            emptyList: "No programs available. Please add a new program.");
+          title: 'Work Log Fit - Programs',
+          boxName: 'programs',
+          emptyList: "No programs available. Please add a new program.",
+          extraButtonName: 'Settings',
+          extraButtonIcon: 'Settings',
+        );
 
   @override
   _ProgramsListScreenState createState() => _ProgramsListScreenState();
