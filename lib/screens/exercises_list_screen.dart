@@ -17,6 +17,17 @@ class ExerciseListScreen extends BaseListScreen<Exercise> {
   _ExerciseListScreenState createState() => _ExerciseListScreenState();
 }
 
+class MuscleGroups {
+  static const String abs = 'abs';
+  static const String biceps = 'biceps';
+  static const String triceps = 'triceps';
+  static const String legs = 'legs';
+  static const String chest = 'chest';
+  static const String shoulder = 'shoulder';
+  static const String back = 'back';
+  static const String other = 'other';
+}
+
 class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
   // This box will store custom exercises added by the user
   late Box<dynamic> customExercisesBox;
@@ -24,27 +35,61 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
   // Predefined categories and exercises
   final Map<String, List<Exercise>> categories = {
     'Abs': [
-      Exercise(name: 'Crunch', programId: 0),
-      Exercise(name: 'Leg Raise', programId: 0),
+      Exercise(name: 'Crunches', muscleGroup: MuscleGroups.abs),
+      Exercise(name: 'Flat bench leg raises', muscleGroup: MuscleGroups.abs),
     ],
     'Biceps': [
-      Exercise(name: 'Larry Scott Dumbbell Curl', programId: 0),
+      Exercise(
+          name: 'Preacher curl with machine', muscleGroup: MuscleGroups.biceps),
+      Exercise(
+          name: 'Standing biceps curl with cable',
+          muscleGroup: MuscleGroups.biceps),
     ],
     'Triceps': [
-      Exercise(name: 'Dips', programId: 0),
+      Exercise(
+          name: 'Triceps dips using body weight',
+          muscleGroup: MuscleGroups.triceps),
+      Exercise(name: 'Triceps Dips', muscleGroup: MuscleGroups.triceps),
+      Exercise(
+          name: 'Triceps pushdown with rope and cable',
+          muscleGroup: MuscleGroups.triceps),
+      Exercise(
+          name: 'Triceps pushdown with cable',
+          muscleGroup: MuscleGroups.triceps),
+      Exercise(
+          name: 'Triceps extensions using machine',
+          muscleGroup: MuscleGroups.triceps),
+      Exercise(
+          name: 'Straight Arm Push down', muscleGroup: MuscleGroups.triceps),
     ],
     'Legs': [
-      Exercise(name: 'Leg Press', programId: 0),
+      Exercise(name: 'Leg press', muscleGroup: MuscleGroups.legs),
+      Exercise(name: 'Barbell squat', muscleGroup: MuscleGroups.legs),
+      Exercise(name: 'Leg extensions', muscleGroup: MuscleGroups.legs),
+      Exercise(name: 'Lying leg curl machine', muscleGroup: MuscleGroups.legs),
+      Exercise(name: 'Seated leg curl', muscleGroup: MuscleGroups.legs),
+      Exercise(name: 'Smith machine squats', muscleGroup: MuscleGroups.legs),
+      Exercise(name: 'Thigh abductor', muscleGroup: MuscleGroups.legs),
     ],
     'Chest': [
-      Exercise(name: 'Butterfly', programId: 0),
-      Exercise(name: 'Machine Bench Press', programId: 0),
+      Exercise(name: 'Butterfly machine', muscleGroup: MuscleGroups.chest),
+      Exercise(name: 'Machine bench press', muscleGroup: MuscleGroups.chest),
+      Exercise(name: 'Incline chest press', muscleGroup: MuscleGroups.chest),
+      Exercise(name: 'Bench press', muscleGroup: MuscleGroups.chest),
+      Exercise(
+          name: 'Smith machine bench press', muscleGroup: MuscleGroups.chest),
+      Exercise(name: 'Push ups', muscleGroup: MuscleGroups.chest),
     ],
     'Shoulder': [
-      Exercise(name: 'Machine Shoulder Military Press', programId: 0),
+      Exercise(
+          name: 'Seated Shoulder press machine',
+          muscleGroup: MuscleGroups.shoulder),
     ],
     'Back': [
-      Exercise(name: 'Lat Pulldown', programId: 0),
+      Exercise(name: 'Wide grip lat pull down', muscleGroup: MuscleGroups.back),
+      Exercise(name: 'Seated cable rows', muscleGroup: MuscleGroups.back),
+      Exercise(name: 'Pull ups', muscleGroup: MuscleGroups.back),
+      Exercise(name: 'Hyperextensions', muscleGroup: MuscleGroups.back),
     ],
     'Other': [],
   };
@@ -74,12 +119,15 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
       // Add a list tile for each exercise in the category
       categorySections.addAll(exercises.map((exercise) {
         return ListTile(
-          leading: Container(
-            color: Theme.of(context).canvasColor,
-            child: Image.asset(
-              'assets/program_icon.png',
+          leading: ClipOval(
+            child: Container(
+              color: Colors.transparent,
               width: 50.0,
               height: 50.0,
+              child: Image.asset(
+                exercise.getImageIcon(),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           title: Text(exercise.name),
@@ -91,10 +139,7 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
           trailing: showDelete
               ? IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () {
-                    // Perform deletion from the customExercisesBox and update the UI accordingly
-                    // You may need a method to get the index or key of the exercise in the customExercisesBox
-                  },
+                  onPressed: () {},
                 )
               : null,
         );

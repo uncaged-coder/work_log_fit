@@ -1,9 +1,10 @@
 import 'package:hive/hive.dart';
 import 'hive_type_ids.dart';
+import 'hive_entity.dart';
 part 'work_log_entry.g.dart';
 
 @HiveType(typeId: HiveTypeIds.workLogEntry)
-class WorkLogEntry extends HiveObject {
+class WorkLogEntry extends HiveEntity {
   @HiveField(0)
   final int weight;
 

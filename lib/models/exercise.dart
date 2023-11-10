@@ -1,14 +1,46 @@
 import 'package:hive/hive.dart';
 import 'hive_type_ids.dart';
+import 'hive_entity.dart';
 part 'exercise.g.dart';
 
 @HiveType(typeId: HiveTypeIds.exercise)
-class Exercise extends HiveObject {
+class Exercise extends HiveEntity {
   @HiveField(0)
   final String name;
 
   @HiveField(1)
-  final int programId;
+  String image;
 
-  Exercise({required this.name, required this.programId});
+  @HiveField(2)
+  String muscleGroup;
+
+  @HiveField(3)
+  int programId;
+
+  Exercise(
+      {required this.name,
+      this.programId = 0,
+      required this.muscleGroup,
+      this.image = ''})
+      : super();
+
+  @override
+  bool useImage() {
+    return true;
+  }
+
+  @override
+  String getImageIcon() {
+    if (image.isNotEmpty) {
+      return 'assets/user_images/$image';
+    }
+
+    String formattedName = name.toLowerCase().replaceAll(' ', '-');
+    return 'assets/icons/$muscleGroup/$formattedName-icon.png';
+  }
+
+  @override
+  bool useGroup() {
+    return true;
+  }
 }

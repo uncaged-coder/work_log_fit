@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:work_log_fit/models/hive_entity.dart';
 
 const brightPurple = Color.fromRGBO(15, 59, 42, 1);
 const brightPurple2 = Color.fromRGBO(80, 200, 120, 1);
@@ -23,7 +24,7 @@ abstract class BaseListScreen<T> extends StatefulWidget {
   State<BaseListScreen<T>> createState();
 }
 
-abstract class BaseListScreenState<T extends HiveObject>
+abstract class BaseListScreenState<T extends HiveEntity>
     extends State<BaseListScreen<T>> {
   List<T> baseItemList = [];
   late Box<dynamic> baseItemBox;
@@ -114,12 +115,15 @@ abstract class BaseListScreenState<T extends HiveObject>
     return baseItemList.map((item) {
       int index = baseItemList.indexOf(item);
       return ListTile(
-        leading: Container(
-          color: Theme.of(context).canvasColor,
-          child: Image.asset(
-            'assets/program_icon.png',
+        leading: ClipOval(
+          child: Container(
+            color: Colors.transparent,
             width: 50.0,
             height: 50.0,
+            child: Image.asset(
+              item.getImageIcon(),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         title: Text(getItemString(item)),
