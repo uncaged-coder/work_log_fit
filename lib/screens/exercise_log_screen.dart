@@ -16,6 +16,7 @@ class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
           emptyList: 'No logs available - please add a new log.',
           button1Name: 'Stats',
           button1Icon: 'Monitoring',
+          showTimer: true,
         );
 
   @override

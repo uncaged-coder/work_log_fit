@@ -3,12 +3,16 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:work_log_fit/models/program.dart';
 import 'package:work_log_fit/models/exercise.dart';
 import 'package:work_log_fit/models/work_log_entry.dart';
 import 'screens/programs_list_screen.dart';
+import 'timer.dart';
 
 void main() async {
+  final GlobalTimerManager globalTimerManager = GlobalTimerManager();
+
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set the path for Hive based on the platform
@@ -31,7 +35,12 @@ void main() async {
   await Hive.openBox('programs');
   printHivePath();
 
-  runApp(WorkLogFitApp());
+  runApp(
+    Provider<GlobalTimerManager>.value(
+      value: globalTimerManager,
+      child: WorkLogFitApp(),
+    ),
+  );
 }
 
 void printHivePath() {

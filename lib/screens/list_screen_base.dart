@@ -1,11 +1,15 @@
+import 'dart:async';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/hive_entity.dart';
+import 'package:work_log_fit/timer.dart';
 
 const themeColor = Color.fromRGBO(15, 59, 42, 1);
 const themeColor2 = Color.fromRGBO(80, 200, 120, 1);
 
-abstract class BaseListScreen<T> extends StatefulWidget {
+abstract class BaseListScreen<T> extends StatefulWidget
+    implements PreferredSizeWidget {
   final String title;
   final String boxName;
   final String emptyList;
@@ -13,6 +17,7 @@ abstract class BaseListScreen<T> extends StatefulWidget {
   final String button1Icon;
   bool enableDeleteButton;
   bool enableFirstButton;
+  bool showTimer;
 
   BaseListScreen({
     required this.title,
@@ -22,7 +27,11 @@ abstract class BaseListScreen<T> extends StatefulWidget {
     this.button1Icon = 'Settings',
     this.enableDeleteButton = true,
     this.enableFirstButton = true,
+    this.showTimer = false,
   });
+
+  @override
+  final Size preferredSize = const Size.fromHeight(56.0);
 
   @override
   State<BaseListScreen<T>> createState();
@@ -33,6 +42,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
   List<T> baseItemList = [];
   late Box<dynamic> baseItemBox;
   bool showDelete = false;
+  late GlobalTimerManager timerManager;
 
   // to be overriden
   void itemSelected(BuildContext context, T item);
@@ -42,6 +52,14 @@ abstract class BaseListScreenState<T extends HiveEntity>
   void initState() {
     super.initState();
     _initializeBoxAndLoadItems();
+    timerManager = Provider.of<GlobalTimerManager>(context, listen: false);
+    timerManager.updateTickCb(onTick: () => setState(() {}));
+  }
+
+  String formatTime(int seconds) {
+    int min = seconds ~/ 60;
+    int sec = seconds % 60;
+    return '${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
   }
 
   void _initializeBoxAndLoadItems() async {
@@ -112,7 +130,10 @@ abstract class BaseListScreenState<T extends HiveEntity>
           ],
         );
       },
-    );
+    ).then((_) {
+      // This block is executed after the dialog is closed.
+      timerManager.updateTickCb(onTick: () => setState(() {}));
+    });
   }
 
   List<Widget> buildItemList(BuildContext context) {
@@ -159,6 +180,17 @@ abstract class BaseListScreenState<T extends HiveEntity>
     }
   }
 
+  void _toggleTimer() {
+    if (timerManager.isTimerRunning) {
+      timerManager.stopTimer();
+    } else {
+      timerManager.startTimer(onTick: () => setState(() {}));
+    }
+
+    // Force the widget to rebuild and update the UI
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     int deleteIndex;
@@ -178,7 +210,30 @@ abstract class BaseListScreenState<T extends HiveEntity>
     List<Widget> itemList = buildItemList(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(color: themeColor2)),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(widget.title, style: TextStyle(color: themeColor2)),
+            if (widget.showTimer)
+              Row(
+                children: [
+                  Text(
+                    formatTime(timerManager.remainingSeconds),
+                    style: TextStyle(
+                      fontFamily: 'DigitalDisplay',
+                      color: Colors.red,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(timerManager.isTimerRunning
+                        ? Icons.stop
+                        : Icons.play_arrow),
+                    onPressed: _toggleTimer,
+                  ),
+                ],
+              ),
+          ],
+        ),
       ),
       body: itemList.isEmpty
           ? Center(child: Text(widget.emptyList))
@@ -220,7 +275,8 @@ abstract class BaseListScreenState<T extends HiveEntity>
 
   @override
   void dispose() {
-    baseItemBox.close(); // Don't forget to close the Hive box
+    timerManager.updateTickCb(onTick: null);
+    baseItemBox.close();
     super.dispose();
   }
 }
