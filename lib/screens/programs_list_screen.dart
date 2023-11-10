@@ -9,8 +9,6 @@ class ProgramsListScreen extends BaseListScreen<Program> {
           title: 'Work Log Fit - Programs',
           boxName: 'programs',
           emptyList: "No programs available. Please add a new program.",
-          extraButtonName: 'Settings',
-          extraButtonIcon: 'Settings',
         );
 
   @override

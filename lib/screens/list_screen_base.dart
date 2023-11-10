@@ -2,22 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/hive_entity.dart';
 
-const brightPurple = Color.fromRGBO(15, 59, 42, 1);
-const brightPurple2 = Color.fromRGBO(80, 200, 120, 1);
+const themeColor = Color.fromRGBO(15, 59, 42, 1);
+const themeColor2 = Color.fromRGBO(80, 200, 120, 1);
 
 abstract class BaseListScreen<T> extends StatefulWidget {
   final String title;
   final String boxName;
   final String emptyList;
-  final String extraButtonName;
-  final String extraButtonIcon;
+  final String button1Name;
+  final String button1Icon;
+  bool enableDeleteButton;
+  bool enableFirstButton;
 
   BaseListScreen({
     required this.title,
     required this.boxName,
     required this.emptyList,
-    required this.extraButtonName,
-    required this.extraButtonIcon,
+    this.button1Name = 'Settings',
+    this.button1Icon = 'Settings',
+    this.enableDeleteButton = true,
+    this.enableFirstButton = true,
   });
 
   @override
@@ -148,6 +152,8 @@ abstract class BaseListScreenState<T extends HiveEntity>
         return Icons.settings;
       case 'Monitoring':
         return Icons.show_chart;
+      case 'fitness_center':
+        return Icons.fitness_center;
       default:
         return Icons.error;
     }
@@ -155,10 +161,24 @@ abstract class BaseListScreenState<T extends HiveEntity>
 
   @override
   Widget build(BuildContext context) {
+    int deleteIndex;
+    int addIndex;
+
+    if (widget.enableFirstButton && widget.enableDeleteButton) {
+      deleteIndex = 1;
+      addIndex = 2;
+    } else if (!widget.enableFirstButton && widget.enableDeleteButton) {
+      deleteIndex = 0;
+      addIndex = 1;
+    } else {
+      deleteIndex = -1;
+      addIndex = 0;
+    }
+
     List<Widget> itemList = buildItemList(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title, style: TextStyle(color: themeColor2)),
       ),
       body: itemList.isEmpty
           ? Center(child: Text(widget.emptyList))
@@ -167,28 +187,29 @@ abstract class BaseListScreenState<T extends HiveEntity>
             ),
       bottomNavigationBar: BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(
-            icon: Icon(_getIconFromString(widget.extraButtonIcon)),
-            label: widget.extraButtonName,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.delete),
-            label: 'Delete',
-          ),
+          if (widget.enableFirstButton)
+            BottomNavigationBarItem(
+              icon: Icon(_getIconFromString(widget.button1Icon)),
+              label: widget.button1Name,
+            ),
+          if (widget.enableDeleteButton)
+            BottomNavigationBarItem(
+              icon: Icon(Icons.delete),
+              label: 'Delete',
+            ),
           BottomNavigationBarItem(
             icon: CircleAvatar(
-                backgroundColor: brightPurple,
+                backgroundColor: themeColor,
                 child: Icon(Icons.add, color: Colors.white)),
             label: 'Add',
           ),
         ],
         onTap: (index) {
-          if (index == 1) {
-            // Toggle delete button visibility
+          if (index == deleteIndex) {
             setState(() {
               showDelete = !showDelete;
             });
-          } else if (index == 2) {
+          } else if (index == addIndex) {
             // Show add dialog
             showAddItemDialog(context);
           }

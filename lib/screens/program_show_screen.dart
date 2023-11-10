@@ -15,8 +15,7 @@ class ProgramShowScreen extends BaseListScreen<Exercise> {
           title: '${program.name} program',
           boxName: 'program',
           emptyList: 'No exercices available - please add a new exercise.',
-          extraButtonName: 'Settings',
-          extraButtonIcon: 'Settings',
+          enableFirstButton: false,
         );
 
   @override

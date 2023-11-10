@@ -14,8 +14,8 @@ class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
           title: '${exercise.name} log',
           boxName: 'workLog',
           emptyList: 'No logs available - please add a new log.',
-          extraButtonName: 'Stats',
-          extraButtonIcon: 'Monitoring',
+          button1Name: 'Stats',
+          button1Icon: 'Monitoring',
         );
 
   @override
@@ -101,7 +101,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
       // Add date header with styling
       listItems.add(
         Container(
-          color: brightPurple, // Use the purple color constant defined earlier
+          color: themeColor,
           padding: const EdgeInsets.all(8.0),
           child: Text(
             DateFormat('yyyy/MM/dd').format(date),
@@ -121,11 +121,11 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
                     children: <TextSpan>[
                       TextSpan(
                           text: '${log.repetitions} ',
-                          style: TextStyle(color: brightPurple2)),
+                          style: TextStyle(color: themeColor2)),
                       const TextSpan(text: 'x '),
                       TextSpan(
                           text: '${log.weight} ',
-                          style: TextStyle(color: brightPurple2)),
+                          style: TextStyle(color: themeColor2)),
                       const TextSpan(text: 'kg'),
                     ],
                   ),

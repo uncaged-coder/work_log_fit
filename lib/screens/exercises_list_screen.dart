@@ -9,8 +9,9 @@ class ExerciseListScreen extends BaseListScreen<Exercise> {
           title: 'Work Log Fit - Exercices',
           boxName: 'exercices',
           emptyList: 'No exercices available. Please add a new exercice.',
-          extraButtonName: 'Settings',
-          extraButtonIcon: 'Settings',
+          button1Name: 'Custom exercise',
+          button1Icon: 'fitness_center',
+          enableDeleteButton: false,
         );
 
   @override
@@ -108,7 +109,8 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
     categories.forEach((category, exercises) {
       // Add a section header for the category
       categorySections.add(
-        Padding(
+        Container(
+          color: themeColor,
           padding: const EdgeInsets.all(8.0),
           child: Text(
             category,
