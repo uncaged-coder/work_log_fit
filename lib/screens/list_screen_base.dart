@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/hive_entity.dart';
 import 'package:work_log_fit/timer.dart';
+import 'package:work_log_fit/settings.dart';
 
 const themeColor = Color.fromRGBO(15, 59, 42, 1);
 const themeColor2 = Color.fromRGBO(80, 200, 120, 1);
@@ -16,8 +17,9 @@ abstract class BaseListScreen<T> extends StatefulWidget
   final String button1Name;
   final String button1Icon;
   String titleIcon;
+  bool enableFirstButton; // custom buton
   bool enableDeleteButton;
-  bool enableFirstButton;
+  bool enableAddButton;
   bool showTimer;
 
   BaseListScreen({
@@ -28,6 +30,7 @@ abstract class BaseListScreen<T> extends StatefulWidget
     this.button1Name = 'Settings',
     this.button1Icon = 'Settings',
     this.enableDeleteButton = true,
+    this.enableAddButton = true,
     this.enableFirstButton = true,
     this.showTimer = false,
   });
@@ -85,7 +88,20 @@ abstract class BaseListScreenState<T extends HiveEntity>
     });
   }
 
-  void _deleteItem(T item) {
+  void updateItem(T item) {
+    int key = item.key;
+    baseItemBox.put(key, item);
+
+    // Find the index of the item in the in-memory list
+    int index = baseItemList.indexWhere((element) => element.key == key);
+    if (index != -1) {
+      setState(() {
+        baseItemList[index] = item;
+      });
+    }
+  }
+
+  void deleteItem(T item) {
     baseItemBox.delete(item.key);
     setState(() {
       baseItemList.remove(item);
@@ -161,7 +177,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
         trailing: showDelete
             ? IconButton(
                 icon: Icon(Icons.delete),
-                onPressed: () => _deleteItem(item),
+                onPressed: () => deleteItem(item),
               )
             : null,
         onTap: () {
@@ -199,19 +215,12 @@ abstract class BaseListScreenState<T extends HiveEntity>
 
   @override
   Widget build(BuildContext context) {
-    int deleteIndex;
-    int addIndex;
+    Color backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    int nextIndex = 0;
 
-    if (widget.enableFirstButton && widget.enableDeleteButton) {
-      deleteIndex = 1;
-      addIndex = 2;
-    } else if (!widget.enableFirstButton && widget.enableDeleteButton) {
-      deleteIndex = 0;
-      addIndex = 1;
-    } else {
-      deleteIndex = -1;
-      addIndex = 0;
-    }
+    int customIndex = widget.enableFirstButton ? nextIndex++ : -1;
+    int deleteIndex = widget.enableDeleteButton ? nextIndex++ : -1;
+    int addIndex = widget.enableAddButton ? nextIndex++ : -1;
 
     List<Widget> itemList = buildItemList(context);
     return Scaffold(
@@ -264,10 +273,14 @@ abstract class BaseListScreenState<T extends HiveEntity>
             ),
           BottomNavigationBarItem(
             icon: CircleAvatar(
-                backgroundColor: themeColor,
-                child: Icon(Icons.add, color: Colors.white)),
-            label: 'Add',
-          ),
+              backgroundColor:
+                  widget.enableAddButton ? themeColor : backgroundColor,
+              child: Icon(Icons.add,
+                  color:
+                      widget.enableAddButton ? Colors.white : backgroundColor),
+            ),
+            label: widget.enableAddButton ? 'Add' : '',
+          )
         ],
         onTap: (index) {
           if (index == deleteIndex) {
@@ -277,6 +290,8 @@ abstract class BaseListScreenState<T extends HiveEntity>
           } else if (index == addIndex) {
             // Show add dialog
             showAddItemDialog(context);
+          } else if (index == customIndex) {
+            // Not implemtented
           }
         },
       ),

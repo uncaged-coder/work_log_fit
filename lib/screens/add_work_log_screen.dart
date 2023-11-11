@@ -1,21 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:work_log_fit/models/work_log_entry.dart';
+import 'package:work_log_fit/settings.dart';
 
 class AddWorkLogScreen extends StatefulWidget {
+  final WorkLogEntry? existingEntry;
   final exerciseId;
+  final bool update;
 
-  AddWorkLogScreen(this.exerciseId);
+  AddWorkLogScreen(
+      {this.existingEntry, required this.exerciseId, this.update = false});
 
   @override
-  _AddWorkLogScreenState createState() => _AddWorkLogScreenState(exerciseId);
+  _AddWorkLogScreenState createState() => _AddWorkLogScreenState();
 }
 
 class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
-  final exerciseId;
-  String weight = '0';
-  String repetitions = '0';
+  late String weight;
+  late String repetitions;
+  String saveText = 'Save';
 
-  _AddWorkLogScreenState(this.exerciseId);
+  _AddWorkLogScreenState();
+
+  void initState() {
+    super.initState();
+    weight = widget.existingEntry?.weight.toString() ?? '0';
+    repetitions = widget.existingEntry?.repetitions.toString() ?? '0';
+    saveText = 'Update';
+  }
 
   void addNumber(String number, String type) {
     setState(() {
@@ -57,8 +68,7 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
           onPressed: () => addNumber(number, type),
           child: Text(number, style: TextStyle(fontSize: 24)),
           style: ElevatedButton.styleFrom(
-            minimumSize: Size(
-                double.infinity, double.infinity), // Make the button expand
+            minimumSize: Size(double.infinity, double.infinity),
           ),
         ),
       ),
@@ -73,9 +83,8 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
           onPressed: () => deleteNumber(type),
           child: Icon(Icons.backspace, size: 24),
           style: ElevatedButton.styleFrom(
-            primary: Colors.red, // Background color
-            minimumSize: Size(
-                double.infinity, double.infinity), // Make the button expand
+            primary: themeRed, // Background color
+            minimumSize: Size(double.infinity, double.infinity),
           ),
         ),
       ),
@@ -167,7 +176,8 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 15.0, horizontal: 30.0),
-                    child: Text('Cancel', style: TextStyle(fontSize: 24)),
+                    child: Text('Cancel',
+                        style: TextStyle(fontSize: 24, color: Colors.white)),
                   ),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red, // Cancel button color
@@ -176,21 +186,32 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                 ElevatedButton(
                   // Save functionality
                   onPressed: () {
-                    final workLog = WorkLogEntry(
-                      weight: int.tryParse(weight) ?? 0,
-                      repetitions: int.tryParse(repetitions) ?? 0,
-                      date: DateTime.now(),
-                      exerciseId: exerciseId,
-                    );
+                    WorkLogEntry workLog;
+                    if (widget.update && widget.existingEntry != null) {
+                      // Update existing entry
+                      workLog = widget
+                          .existingEntry!; //WorkLogEntry.clone(widget.existingEntry!);
+                      workLog.repetitions = int.tryParse(repetitions) ?? 0;
+                      workLog.weight = int.tryParse(weight) ?? 0;
+                    } else {
+                      // Create new entry
+                      workLog = WorkLogEntry(
+                        weight: int.tryParse(weight) ?? 0,
+                        repetitions: int.tryParse(repetitions) ?? 0,
+                        date: DateTime.now(),
+                        exerciseId: widget.exerciseId,
+                      );
+                    }
                     Navigator.pop(context, workLog);
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 15.0, horizontal: 30.0),
-                    child: Text('Save', style: TextStyle(fontSize: 24)),
+                    child: Text(saveText,
+                        style: TextStyle(fontSize: 24, color: Colors.white)),
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.green, // Save button color
+                    primary: themeColor, // Save button color
                   ),
                 ),
               ],

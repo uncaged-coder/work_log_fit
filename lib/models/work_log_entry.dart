@@ -6,10 +6,10 @@ part 'work_log_entry.g.dart';
 @HiveType(typeId: HiveTypeIds.workLogEntry)
 class WorkLogEntry extends HiveEntity {
   @HiveField(0)
-  final int weight;
+  int weight;
 
   @HiveField(1)
-  final int repetitions;
+  int repetitions;
 
   @HiveField(2)
   final DateTime date;

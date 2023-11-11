@@ -12,6 +12,7 @@ class ExerciseListScreen extends BaseListScreen<Exercise> {
           button1Name: 'Custom exercise',
           button1Icon: 'fitness_center',
           enableDeleteButton: false,
+          enableAddButton: false,
         );
 
   @override
@@ -153,5 +154,10 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
   @override
   void itemSelected(BuildContext context, Exercise item) {
     Navigator.pop(context, item);
+  }
+
+  @override
+  void showAddItemDialog(BuildContext context) async {
+    print("show add item");
   }
 }

@@ -17,12 +17,15 @@ class Exercise extends HiveEntity {
   @HiveField(3)
   int programId;
 
-  Exercise(
-      {required this.name,
-      this.programId = 0,
-      required this.muscleGroup,
-      this.image = ''})
-      : super();
+  bool customExercise;
+
+  Exercise({
+    required this.name,
+    this.programId = 0,
+    required this.muscleGroup,
+    this.image = '',
+    this.customExercise = false,
+  }) : super();
 
   @override
   bool useImage() {

@@ -26,6 +26,8 @@ class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
 
 class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
   final Exercise exercise; // parent
+  bool showDelete = false;
+  WorkLogEntry? _lastLog;
 
   _ExerciseLogScreenState(this.exercise);
 
@@ -44,27 +46,56 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
         .reversed
         .toList();
 
+    // Update the last log
+    if (logs.isNotEmpty) {
+      _lastLog = logs.first;
+    }
+
     // Return the exercises in case you need them
     return logs;
   }
 
-  @override
-  void showAddItemDialog(BuildContext context) async {
-    final WorkLogEntry log = await Navigator.push(
+  WorkLogEntry _getLastLog() {
+    return _lastLog ??
+        WorkLogEntry(
+          weight: 0,
+          repetitions: 0,
+          date: DateTime.now(),
+          exerciseId: exercise.key,
+        );
+  }
+
+  Future<void> handleLogEntry(
+      BuildContext context, WorkLogEntry log, bool update) async {
+    final WorkLogEntry? modifiedLog = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddWorkLogScreen(exercise.key),
+        builder: (context) => AddWorkLogScreen(
+            exerciseId: exercise.key, existingEntry: log, update: update),
       ),
     );
 
-    setState(() {
-      addItem(log);
-    });
+    if (modifiedLog != null) {
+      setState(() {
+        if (update && (modifiedLog.key != null)) {
+          updateItem(modifiedLog);
+        } else {
+          addItem(modifiedLog);
+          _lastLog = modifiedLog;
+        }
+      });
+    }
   }
 
   @override
-  void itemSelected(BuildContext context, WorkLogEntry item) {
-    // Nothing for now.
+  void showAddItemDialog(BuildContext context) async {
+    WorkLogEntry lastLog = _getLastLog();
+    await handleLogEntry(context, lastLog, false);
+  }
+
+  @override
+  void itemSelected(BuildContext context, WorkLogEntry item) async {
+    await handleLogEntry(context, item, true);
   }
 
   Map<DateTime, List<WorkLogEntry>> _groupLogsByDate() {
@@ -132,6 +163,17 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
                     ],
                   ),
                 ),
+                trailing: showDelete
+                    ? IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () => deleteItem(log),
+                      )
+                    : null,
+                onTap: () {
+                  if (!showDelete) {
+                    itemSelected(context, log);
+                  }
+                },
               ))
           .toList();
       listItems.addAll(logEntries);
