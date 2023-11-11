@@ -15,6 +15,7 @@ abstract class BaseListScreen<T> extends StatefulWidget
   final String emptyList;
   final String button1Name;
   final String button1Icon;
+  String titleIcon;
   bool enableDeleteButton;
   bool enableFirstButton;
   bool showTimer;
@@ -23,6 +24,7 @@ abstract class BaseListScreen<T> extends StatefulWidget
     required this.title,
     required this.boxName,
     required this.emptyList,
+    this.titleIcon = '',
     this.button1Name = 'Settings',
     this.button1Icon = 'Settings',
     this.enableDeleteButton = true,
@@ -136,21 +138,25 @@ abstract class BaseListScreenState<T extends HiveEntity>
     });
   }
 
+  Widget printImage(String image) {
+    return ClipOval(
+      child: Container(
+        color: Colors.transparent,
+        width: 50.0,
+        height: 50.0,
+        child: Image.asset(
+          image,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
   List<Widget> buildItemList(BuildContext context) {
     return baseItemList.map((item) {
       int index = baseItemList.indexOf(item);
       return ListTile(
-        leading: ClipOval(
-          child: Container(
-            color: Colors.transparent,
-            width: 50.0,
-            height: 50.0,
-            child: Image.asset(
-              item.getImageIcon(),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+        leading: printImage(item.getImageIcon()),
         title: Text(getItemString(item)),
         trailing: showDelete
             ? IconButton(
@@ -213,8 +219,11 @@ abstract class BaseListScreenState<T extends HiveEntity>
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+            if (widget.titleIcon != '') ...[
+              printImage(widget.titleIcon),
+            ],
             Text(widget.title, style: TextStyle(color: themeColor2)),
-            if (widget.showTimer)
+            if (widget.showTimer) ...[
               Row(
                 children: [
                   Text(
@@ -232,6 +241,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
                   ),
                 ],
               ),
+            ],
           ],
         ),
       ),
