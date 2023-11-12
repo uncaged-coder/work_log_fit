@@ -8,8 +8,13 @@ import 'package:work_log_fit/models/program.dart';
 import 'package:work_log_fit/models/exercise.dart';
 import 'package:work_log_fit/models/work_log_entry.dart';
 import 'screens/programs_list_screen.dart';
+import 'hive_manager.dart';
 import 'timer.dart';
 import 'settings.dart';
+
+Future<void> _initializeHive() async {
+  await HiveManager().openAllBoxes();
+}
 
 void main() async {
   final GlobalTimerManager globalTimerManager = GlobalTimerManager();
@@ -34,6 +39,7 @@ void main() async {
   Hive.registerAdapter(ExerciseAdapter());
   Hive.registerAdapter(WorkLogEntryAdapter());
   printHivePath();
+  await _initializeHive();
 
   runApp(
     Provider<GlobalTimerManager>.value(
@@ -59,5 +65,9 @@ class WorkLogFitApp extends StatelessWidget {
       ),
       home: ProgramsListScreen(),
     );
+  }
+
+  void dispose() {
+    HiveManager().closeAllBoxes();
   }
 }

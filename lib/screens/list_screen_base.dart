@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/hive_entity.dart';
 import 'package:work_log_fit/timer.dart';
 import 'package:work_log_fit/settings.dart';
+import 'package:work_log_fit/hive_manager.dart';
 
 abstract class BaseListScreen<T> extends StatefulWidget
     implements PreferredSizeWidget {
@@ -69,11 +70,11 @@ abstract class BaseListScreenState<T extends HiveEntity>
 
   void _initializeBoxAndLoadItems() async {
     // Directly setting the box variables without intermediate variables
-    baseItemsBox = await Hive.openBox(widget.boxItemsName);
+    baseItemsBox = HiveManager().getDataBox(widget.boxItemsName);
     baseItemsList = await loadItems(baseItemsBox);
 
     if (widget.boxName != null) {
-      baseBox = await Hive.openBox(widget.boxName!);
+      baseBox = await HiveManager().getDataBox(widget.boxName!);
     } else {
       baseBox = null;
     }
@@ -86,7 +87,9 @@ abstract class BaseListScreenState<T extends HiveEntity>
     return box.values.cast<T>().toList().reversed.toList();
   }
 
-  void saveItem(T item, {dynamic key = null}) {
+  void saveItem(T item, {dynamic key = null}) async {
+    baseItemsBox = HiveManager().getDataBox(widget.boxItemsName);
+
     if (key != null) {
       // If a key is provided, use it
       baseItemsBox.put(key, item);
@@ -115,7 +118,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
   }
 
   void deleteItem(T item) {
-    baseItemsBox.delete(item.key);
+    item.remove();
     setState(() {
       baseItemsList.remove(item);
     });
@@ -319,8 +322,6 @@ abstract class BaseListScreenState<T extends HiveEntity>
   @override
   void dispose() {
     timerManager.updateTickCb(onTick: null);
-    baseItemsBox.close();
-    baseBox?.close();
     super.dispose();
   }
 }

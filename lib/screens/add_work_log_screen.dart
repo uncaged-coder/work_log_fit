@@ -193,8 +193,7 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                     WorkLogEntry workLog;
                     if (widget.update && widget.existingEntry != null) {
                       // Update existing entry
-                      workLog = widget
-                          .existingEntry!; //WorkLogEntry.clone(widget.existingEntry!);
+                      workLog = widget.existingEntry!;
                       workLog.repetitions = int.tryParse(repetitions) ?? 0;
                       workLog.weight = int.tryParse(weight) ?? 0;
                     } else {

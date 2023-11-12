@@ -25,13 +25,11 @@ class WorkLogEntry extends HiveEntity {
       required this.repetitions,
       required this.date,
       required this.programId,
-      required this.exerciseId});
+      required this.exerciseId})
+      : super(baseName: 'workLog');
 
-  // Cloning constructor
-  WorkLogEntry.clone(WorkLogEntry original)
-      : weight = original.weight,
-        repetitions = original.repetitions,
-        date = original.date,
-        programId = original.programId,
-        exerciseId = original.exerciseId;
+  @override
+  void remove() {
+    super.remove();
+  }
 }

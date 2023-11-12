@@ -57,6 +57,18 @@ class _ProgramShowScreenState extends BaseListScreenState<Exercise> {
   }
 
   @override
+  void deleteItem(Exercise ex) {
+    // removing logs related to this exercise.
+    // here we dont want to call remove() since it would remove
+    // the exercise from custom exercises database (if custom)
+    ex.removeLogs(program.key);
+    program.removeExercise(ex.getId());
+    setState(() {
+      baseItemsList.remove(ex);
+    });
+  }
+
+  @override
   void showAddItemDialog(BuildContext context) async {
     final Exercise? selectedExercise = await Navigator.push(
       context,

@@ -4,6 +4,13 @@ Work Log Fit is an application primarily designed for Android devices, although 
 
 This project is distributed under the MIT license.
 
+# Warning
+
+I did this application in one week, in my freetime, and without any knowledge of flutter and dart.
+So I did this to learn, and after one week, i can clearly see that it could be simpler.
+One day, I will maybe rewrite it and make it simpler later, but in the mean time, this version is working fine on linux.
+Yes, I didnt yet try it on android, but it should work.
+
 # Everkinetic image
 
 The Work Log Fit application enhances the user experience by incorporating visual representations of different exercises.

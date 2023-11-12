@@ -1,7 +1,10 @@
 import 'package:hive/hive.dart';
+import 'package:work_log_fit/hive_manager.dart';
 
 class HiveEntity extends HiveObject {
-  HiveEntity();
+  String baseName;
+
+  HiveEntity({required this.baseName});
 
   bool useImage() {
     return false;
@@ -13,5 +16,10 @@ class HiveEntity extends HiveObject {
 
   String getImageIcon() {
     return '';
+  }
+
+  void remove() async {
+    var box = HiveManager().getDataBox(baseName);
+    box.delete(this.key);
   }
 }
