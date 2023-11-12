@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'hive_type_ids.dart';
 import 'hive_entity.dart';
+import 'package:work_log_fit/settings.dart';
 part 'exercise.g.dart';
 
 @HiveType(typeId: HiveTypeIds.exercise)
@@ -14,17 +15,13 @@ class Exercise extends HiveEntity {
   @HiveField(2)
   String muscleGroup;
 
-  @HiveField(3)
-  int programId;
-
-  bool customExercise;
+  int? pkey;
 
   Exercise({
     required this.name,
-    this.programId = 0,
     required this.muscleGroup,
     this.image = '',
-    this.customExercise = false,
+    this.pkey = null,
   }) : super();
 
   @override
@@ -32,10 +29,20 @@ class Exercise extends HiveEntity {
     return true;
   }
 
+  bool isCustomExercise() {
+    return pkey == null;
+  }
+
+  int getId() {
+    // exercise can be hardcoded (use pkey) or defined by user
+    // (then use key's of hive database)
+    return pkey ?? key;
+  }
+
   @override
   String getImageIcon() {
-    if (image.isNotEmpty) {
-      return 'assets/user_images/$image';
+    if (isCustomExercise()) {
+      return 'assets/program_icon.png';
     }
 
     String formattedName = name.toLowerCase().replaceAll(' ', '-');

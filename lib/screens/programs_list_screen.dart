@@ -7,7 +7,8 @@ class ProgramsListScreen extends BaseListScreen<Program> {
   ProgramsListScreen()
       : super(
           title: 'Work Log Fit - Programs',
-          boxName: 'programs',
+          boxName: null,
+          boxItemsName: 'programs',
           emptyList: "No programs available. Please add a new program.",
         );
 

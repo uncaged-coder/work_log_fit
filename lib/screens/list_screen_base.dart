@@ -6,13 +6,11 @@ import 'package:work_log_fit/models/hive_entity.dart';
 import 'package:work_log_fit/timer.dart';
 import 'package:work_log_fit/settings.dart';
 
-const themeColor = Color.fromRGBO(15, 59, 42, 1);
-const themeColor2 = Color.fromRGBO(80, 200, 120, 1);
-
 abstract class BaseListScreen<T> extends StatefulWidget
     implements PreferredSizeWidget {
   final String title;
-  final String boxName;
+  final String? boxName;
+  final String boxItemsName;
   final String emptyList;
   final String button1Name;
   final String button1Icon;
@@ -24,8 +22,9 @@ abstract class BaseListScreen<T> extends StatefulWidget
 
   BaseListScreen({
     required this.title,
-    required this.boxName,
+    required this.boxItemsName,
     required this.emptyList,
+    this.boxName = null,
     this.titleIcon = '',
     this.button1Name = 'Settings',
     this.button1Icon = 'Settings',
@@ -44,8 +43,9 @@ abstract class BaseListScreen<T> extends StatefulWidget
 
 abstract class BaseListScreenState<T extends HiveEntity>
     extends State<BaseListScreen<T>> {
-  List<T> baseItemList = [];
-  late Box<dynamic> baseItemBox;
+  List<T> baseItemsList = [];
+  late Box<dynamic> baseItemsBox;
+  late Box? baseBox;
   bool showDelete = false;
   late GlobalTimerManager timerManager;
 
@@ -68,12 +68,17 @@ abstract class BaseListScreenState<T extends HiveEntity>
   }
 
   void _initializeBoxAndLoadItems() async {
-    var box = await Hive.openBox(widget.boxName);
-    var items = await loadItems(box);
-    setState(() {
-      baseItemBox = box;
-      baseItemList = items;
-    });
+    // Directly setting the box variables without intermediate variables
+    baseItemsBox = await Hive.openBox(widget.boxItemsName);
+    baseItemsList = await loadItems(baseItemsBox);
+
+    if (widget.boxName != null) {
+      baseBox = await Hive.openBox(widget.boxName!);
+    } else {
+      baseBox = null;
+    }
+
+    setState(() {});
   }
 
   @override
@@ -81,30 +86,38 @@ abstract class BaseListScreenState<T extends HiveEntity>
     return box.values.cast<T>().toList().reversed.toList();
   }
 
+  void saveItem(T item, {dynamic key = null}) {
+    if (key != null) {
+      // If a key is provided, use it
+      baseItemsBox.put(key, item);
+    } else {
+      baseItemsBox.add(item);
+    }
+  }
+
   void addItem(T item) {
-    baseItemBox.add(item);
     setState(() {
-      baseItemList.insert(0, item);
+      baseItemsList.insert(0, item);
     });
   }
 
   void updateItem(T item) {
     int key = item.key;
-    baseItemBox.put(key, item);
+    baseItemsBox.put(key, item);
 
     // Find the index of the item in the in-memory list
-    int index = baseItemList.indexWhere((element) => element.key == key);
+    int index = baseItemsList.indexWhere((element) => element.key == key);
     if (index != -1) {
       setState(() {
-        baseItemList[index] = item;
+        baseItemsList[index] = item;
       });
     }
   }
 
   void deleteItem(T item) {
-    baseItemBox.delete(item.key);
+    baseItemsBox.delete(item.key);
     setState(() {
-      baseItemList.remove(item);
+      baseItemsList.remove(item);
     });
   }
 
@@ -112,6 +125,9 @@ abstract class BaseListScreenState<T extends HiveEntity>
   T? createItem(String name) {
     return null;
   }
+
+  @override
+  void showCustomItemDialog(BuildContext context) {}
 
   @override
   void showAddItemDialog(BuildContext context) {
@@ -140,6 +156,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
                   T? item = createItem(_textFieldController.text);
                   if (item != null) {
                     addItem(item);
+                    saveItem(item);
                   }
                   Navigator.pop(context);
                 }
@@ -169,8 +186,8 @@ abstract class BaseListScreenState<T extends HiveEntity>
   }
 
   List<Widget> buildItemList(BuildContext context) {
-    return baseItemList.map((item) {
-      int index = baseItemList.indexOf(item);
+    return baseItemsList.map((item) {
+      int index = baseItemsList.indexOf(item);
       return ListTile(
         leading: printImage(item.getImageIcon()),
         title: Text(getItemString(item)),
@@ -292,6 +309,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
             showAddItemDialog(context);
           } else if (index == customIndex) {
             // Not implemtented
+            showCustomItemDialog(context);
           }
         },
       ),
@@ -301,7 +319,8 @@ abstract class BaseListScreenState<T extends HiveEntity>
   @override
   void dispose() {
     timerManager.updateTickCb(onTick: null);
-    baseItemBox.close();
+    baseItemsBox.close();
+    baseBox?.close();
     super.dispose();
   }
 }

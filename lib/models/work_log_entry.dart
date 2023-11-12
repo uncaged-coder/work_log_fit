@@ -17,10 +17,14 @@ class WorkLogEntry extends HiveEntity {
   @HiveField(3)
   final int exerciseId;
 
+  @HiveField(4)
+  final int programId;
+
   WorkLogEntry(
       {required this.weight,
       required this.repetitions,
       required this.date,
+      required this.programId,
       required this.exerciseId});
 
   // Cloning constructor
@@ -28,5 +32,6 @@ class WorkLogEntry extends HiveEntity {
       : weight = original.weight,
         repetitions = original.repetitions,
         date = original.date,
+        programId = original.programId,
         exerciseId = original.exerciseId;
 }

@@ -3,17 +3,19 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:work_log_fit/models/work_log_entry.dart';
 import 'package:work_log_fit/models/exercise.dart';
+import 'package:work_log_fit/settings.dart';
 import 'list_screen_base.dart';
 import 'add_work_log_screen.dart';
 
 class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
   final Exercise exercise;
+  final int programId;
 
-  ExerciseLogScreen({required this.exercise})
+  ExerciseLogScreen({required this.exercise, required this.programId})
       : super(
           title: '${exercise.name} log',
           titleIcon: exercise.getImageIcon(),
-          boxName: 'workLog',
+          boxItemsName: 'workLog',
           emptyList: 'No logs available - please add a new log.',
           button1Name: 'Stats',
           button1Icon: 'Monitoring',
@@ -21,15 +23,17 @@ class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
         );
 
   @override
-  _ExerciseLogScreenState createState() => _ExerciseLogScreenState(exercise);
+  _ExerciseLogScreenState createState() =>
+      _ExerciseLogScreenState(exercise, programId);
 }
 
 class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
   final Exercise exercise; // parent
+  final int programId;
   bool showDelete = false;
   WorkLogEntry? _lastLog;
 
-  _ExerciseLogScreenState(this.exercise);
+  _ExerciseLogScreenState(this.exercise, this.programId);
 
   @override
   String getItemString(WorkLogEntry w) {
@@ -41,7 +45,8 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
     // Obtain the log asynchronously
     var logs = await box.values
         .cast<WorkLogEntry>()
-        .where((log) => log.exerciseId == exercise.key)
+        .where((log) =>
+            log.exerciseId == exercise.getId() && log.programId == programId)
         .toList()
         .reversed
         .toList();
@@ -61,7 +66,8 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
           weight: 0,
           repetitions: 0,
           date: DateTime.now(),
-          exerciseId: exercise.key,
+          exerciseId: exercise.getId(),
+          programId: programId,
         );
   }
 
@@ -71,7 +77,10 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
       context,
       MaterialPageRoute(
         builder: (context) => AddWorkLogScreen(
-            exerciseId: exercise.key, existingEntry: log, update: update),
+            exerciseId: exercise.getId(),
+            programId: programId,
+            existingEntry: log,
+            update: update),
       ),
     );
 
@@ -81,6 +90,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
           updateItem(modifiedLog);
         } else {
           addItem(modifiedLog);
+          saveItem(modifiedLog);
           _lastLog = modifiedLog;
         }
       });
@@ -100,7 +110,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
 
   Map<DateTime, List<WorkLogEntry>> _groupLogsByDate() {
     final Map<DateTime, List<WorkLogEntry>> groupedLogs = {};
-    for (var log in baseItemList) {
+    for (var log in baseItemsList) {
       final date = DateTime(
           log.date.year, log.date.month, log.date.day); // Strip time from date
       groupedLogs.putIfAbsent(date, () => []).add(log);
@@ -117,7 +127,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
   @override
   List<Widget> buildItemList(BuildContext context) {
     // Check if there are any work logs to display
-    if (baseItemList.isEmpty) {
+    if (baseItemsList.isEmpty) {
       // Return an empty list containing just a placeholder widget
       return [Center(child: Text('No logs available'))];
     }

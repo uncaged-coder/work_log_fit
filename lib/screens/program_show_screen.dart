@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/program.dart';
 import 'package:work_log_fit/models/exercise.dart';
+import 'package:work_log_fit/exercises_manager.dart';
 import 'list_screen_base.dart';
 import 'exercise_log_screen.dart';
 import 'exercises_list_screen.dart';
@@ -13,8 +14,9 @@ class ProgramShowScreen extends BaseListScreen<Exercise> {
   ProgramShowScreen({required this.program})
       : super(
           title: '${program.name} program',
-          boxName: 'program',
-          emptyList: 'No exercices available - please add a new exercise.',
+          boxName: 'programs',
+          boxItemsName: 'exercises',
+          emptyList: 'No exercises available - please add a new exercise.',
           enableFirstButton: false,
         );
 
@@ -28,24 +30,28 @@ class _ProgramShowScreenState extends BaseListScreenState<Exercise> {
   _ProgramShowScreenState(this.program);
 
   @override
-  Exercise? createItem(String name) {
-    return new Exercise(
-        name: name, programId: program.key, muscleGroup: 'Other');
-  }
-
-  @override
   String getItemString(Exercise ex) {
     return ex.name;
   }
 
   @override
   Future<List<Exercise>> loadItems(Box<dynamic> box) async {
-    var exercises = await box.values
+    var exercises = box.values
         .cast<Exercise>()
-        .where((exercise) => exercise.programId == program.key)
-        .toList()
-        .reversed
+        .where((exercise) => program.exerciseIds.contains(exercise.key))
         .toList();
+
+    // Instantiate ExerciseManager to access hardcoded exercises
+    var exerciseManager = ExerciseManager();
+
+    // Add hardcoded exercises whose pkey matches with program.exerciseIds
+    for (var id in program.exerciseIds) {
+      var hardcodedExercise = exerciseManager.getExerciseByKey(id);
+      if (hardcodedExercise != null &&
+          !exercises.any((e) => e.pkey == hardcodedExercise.pkey)) {
+        exercises.add(hardcodedExercise);
+      }
+    }
 
     return exercises;
   }
@@ -61,13 +67,24 @@ class _ProgramShowScreenState extends BaseListScreenState<Exercise> {
 
     // Check if an item was selected before trying to add it
     if (selectedExercise != null) {
-      final Exercise clonedExercise = Exercise(
-          name: selectedExercise.name,
-          programId: program.key,
-          image: selectedExercise.image,
-          muscleGroup: selectedExercise.muscleGroup);
-      addItem(clonedExercise);
+      addItem(selectedExercise);
+      _addExercisesToProgram(selectedExercise);
+      _updateProgramInDatabase();
     }
+  }
+
+  void _addExercisesToProgram(Exercise ex) {
+    int? key = ex.pkey ?? ex.key;
+
+    if (key != null) {
+      program.exerciseIds.add(key);
+    } else {
+      print('Error: Exercise key is null');
+    }
+  }
+
+  void _updateProgramInDatabase() {
+    baseBox!.put(program.key, program);
   }
 
   @override
@@ -75,7 +92,8 @@ class _ProgramShowScreenState extends BaseListScreenState<Exercise> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ExerciseLogScreen(exercise: item),
+        builder: (context) =>
+            ExerciseLogScreen(exercise: item, programId: program.key),
       ),
     );
   }

@@ -33,7 +33,6 @@ void main() async {
   Hive.registerAdapter(ProgramAdapter());
   Hive.registerAdapter(ExerciseAdapter());
   Hive.registerAdapter(WorkLogEntryAdapter());
-  await Hive.openBox('programs');
   printHivePath();
 
   runApp(

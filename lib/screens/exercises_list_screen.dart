@@ -1,113 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/exercise.dart';
+import 'package:work_log_fit/settings.dart';
+import 'package:work_log_fit/exercises_manager.dart';
 import 'list_screen_base.dart';
 
 class ExerciseListScreen extends BaseListScreen<Exercise> {
-  ExerciseListScreen()
+  bool customMode;
+
+  ExerciseListScreen({this.customMode = false})
       : super(
           title: 'Work Log Fit - Exercices',
-          boxName: 'exercices',
-          emptyList: 'No exercices available. Please add a new exercice.',
+          boxItemsName: 'exercises',
+          emptyList: 'No exercises available. Please add a new exercise.',
           button1Name: 'Custom exercise',
           button1Icon: 'fitness_center',
-          enableDeleteButton: false,
-          enableAddButton: false,
+          enableDeleteButton: customMode,
+          enableAddButton: customMode,
         );
 
   @override
-  _ExerciseListScreenState createState() => _ExerciseListScreenState();
-}
-
-class MuscleGroups {
-  static const String abs = 'abs';
-  static const String biceps = 'biceps';
-  static const String triceps = 'triceps';
-  static const String legs = 'legs';
-  static const String chest = 'chest';
-  static const String shoulder = 'shoulder';
-  static const String back = 'back';
-  static const String other = 'other';
+  _ExerciseListScreenState createState() =>
+      _ExerciseListScreenState(customMode);
 }
 
 class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
   // This box will store custom exercises added by the user
   late Box<dynamic> customExercisesBox;
-
-  // Predefined categories and exercises
-  final Map<String, List<Exercise>> categories = {
-    'Abs': [
-      Exercise(name: 'Crunches', muscleGroup: MuscleGroups.abs),
-      Exercise(name: 'Flat bench leg raises', muscleGroup: MuscleGroups.abs),
-    ],
-    'Biceps': [
-      Exercise(
-          name: 'Preacher curl with machine', muscleGroup: MuscleGroups.biceps),
-      Exercise(
-          name: 'Standing biceps curl with cable',
-          muscleGroup: MuscleGroups.biceps),
-    ],
-    'Triceps': [
-      Exercise(
-          name: 'Triceps dips using body weight',
-          muscleGroup: MuscleGroups.triceps),
-      Exercise(name: 'Triceps Dips', muscleGroup: MuscleGroups.triceps),
-      Exercise(
-          name: 'Triceps pushdown with rope and cable',
-          muscleGroup: MuscleGroups.triceps),
-      Exercise(
-          name: 'Triceps pushdown with cable',
-          muscleGroup: MuscleGroups.triceps),
-      Exercise(
-          name: 'Triceps extensions using machine',
-          muscleGroup: MuscleGroups.triceps),
-      Exercise(
-          name: 'Straight Arm Push down', muscleGroup: MuscleGroups.triceps),
-    ],
-    'Legs': [
-      Exercise(name: 'Leg press', muscleGroup: MuscleGroups.legs),
-      Exercise(name: 'Barbell squat', muscleGroup: MuscleGroups.legs),
-      Exercise(name: 'Leg extensions', muscleGroup: MuscleGroups.legs),
-      Exercise(name: 'Lying leg curl machine', muscleGroup: MuscleGroups.legs),
-      Exercise(name: 'Seated leg curl', muscleGroup: MuscleGroups.legs),
-      Exercise(name: 'Smith machine squats', muscleGroup: MuscleGroups.legs),
-      Exercise(name: 'Thigh abductor', muscleGroup: MuscleGroups.legs),
-    ],
-    'Chest': [
-      Exercise(name: 'Butterfly machine', muscleGroup: MuscleGroups.chest),
-      Exercise(name: 'Machine bench press', muscleGroup: MuscleGroups.chest),
-      Exercise(name: 'Incline chest press', muscleGroup: MuscleGroups.chest),
-      Exercise(name: 'Bench press', muscleGroup: MuscleGroups.chest),
-      Exercise(
-          name: 'Smith machine bench press', muscleGroup: MuscleGroups.chest),
-      Exercise(name: 'Push ups', muscleGroup: MuscleGroups.chest),
-    ],
-    'Shoulder': [
-      Exercise(
-          name: 'Seated Shoulder press machine',
-          muscleGroup: MuscleGroups.shoulder),
-    ],
-    'Back': [
-      Exercise(name: 'Wide grip lat pull down', muscleGroup: MuscleGroups.back),
-      Exercise(name: 'Seated cable rows', muscleGroup: MuscleGroups.back),
-      Exercise(name: 'Pull ups', muscleGroup: MuscleGroups.back),
-      Exercise(name: 'Hyperextensions', muscleGroup: MuscleGroups.back),
-    ],
-    'Other': [],
-  };
+  final bool customMode;
+  final exerciseManager = ExerciseManager();
 
   // The list of exercises selected by the user to add to the program
   List<String> selectedExercises = [];
+
+  _ExerciseListScreenState(this.customMode);
 
   @override
   String getItemString(Exercise ex) {
     return ex.name;
   }
 
-  @override
-  List<Widget> buildItemList(BuildContext context) {
+  // This method builds the item list for both predefined and custom modes
+  List<Widget> _buildItemList(
+      BuildContext context, Map<String, List<Exercise>> exerciseGroups) {
     List<Widget> categorySections = [];
-    categories.forEach((category, exercises) {
+    exerciseGroups.forEach((category, exercises) {
       // Add a section header for the category
       categorySections.add(
         Container(
@@ -142,7 +79,7 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
           trailing: showDelete
               ? IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () {},
+                  onPressed: () {}, // Implement delete functionality
                 )
               : null,
         );
@@ -151,13 +88,159 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
     return categorySections;
   }
 
+  // This method groups exercises by muscle group
+  Map<String, List<Exercise>> _groupExercisesByMuscleGroup(
+      List<Exercise> exercises) {
+    Map<String, List<Exercise>> groupedExercises = {};
+    for (var exercise in exercises) {
+      if (!groupedExercises.containsKey(exercise.muscleGroup)) {
+        groupedExercises[exercise.muscleGroup] = [];
+      }
+      groupedExercises[exercise.muscleGroup]!.add(exercise);
+    }
+    return groupedExercises;
+  }
+
+  @override
+  List<Widget> buildItemList(BuildContext context) {
+    return customMode
+        ? _buildItemListCustom(context)
+        : _buildItemListPredefined(context);
+  }
+
+  List<Widget> _buildItemListCustom(BuildContext context) {
+    // Group exercises by muscle group
+    Map<String, List<Exercise>> groupedExercises =
+        _groupExercisesByMuscleGroup(baseItemsList);
+
+    // Build item list from grouped exercises
+    return _buildItemList(context, groupedExercises);
+  }
+
+// This method returns predefined exercises grouped by muscle group
+  List<Widget> _buildItemListPredefined(BuildContext context) {
+    return _buildItemList(context, exerciseManager.categories);
+  }
+
   @override
   void itemSelected(BuildContext context, Exercise item) {
     Navigator.pop(context, item);
   }
 
   @override
-  void showAddItemDialog(BuildContext context) async {
-    print("show add item");
+  void showAddItemDialog(BuildContext context) {
+    TextEditingController _exerciseNameController = TextEditingController();
+
+    // List of muscle group names
+    List<String> muscleGroupNames = [
+      MuscleGroups.abs,
+      MuscleGroups.biceps,
+      MuscleGroups.triceps,
+      MuscleGroups.legs,
+      MuscleGroups.chest,
+      MuscleGroups.shoulder,
+      MuscleGroups.back,
+      MuscleGroups.other,
+    ];
+
+    String? _selectedMuscleGroup = muscleGroupNames.first;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Add New Exercise'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text('Muscle Group:'),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _selectedMuscleGroup,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedMuscleGroup = newValue;
+                        });
+                      },
+                      items: muscleGroupNames
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+              TextField(
+                controller: _exerciseNameController,
+                decoration: InputDecoration(hintText: "Exercise Name"),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('CANCEL'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('ADD'),
+              onPressed: () {
+                if (_exerciseNameController.text.isNotEmpty &&
+                    _selectedMuscleGroup != null) {
+                  // Find the current max ID in the box, starting from customExerciseStartId
+                  int newId = baseItemsBox.keys.fold<int>(customExerciseStartId,
+                          (max, current) => current > max ? current : max) +
+                      1;
+
+                  Exercise newItem = Exercise(
+                    name: _exerciseNameController.text,
+                    muscleGroup: _selectedMuscleGroup!,
+                  );
+                  addItem(newItem);
+                  saveItem(newItem, key: newId);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    ).then((_) {
+      // This block is executed after the dialog is closed.
+      timerManager.updateTickCb(onTick: () => setState(() {}));
+    });
+  }
+
+  @override
+  void showCustomItemDialog(BuildContext context) async {
+    // cannot add exercises to hard coded list
+    if (customMode) {
+      // return to previsou windows without selection
+      Navigator.pop(context);
+      return;
+    }
+
+    final Exercise? selectedExercise = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ExerciseListScreen(customMode: true),
+      ),
+    );
+
+    // Check if an item was selected before trying to add it
+    if (selectedExercise != null) {
+      Navigator.pop(context, selectedExercise);
+    }
   }
 }

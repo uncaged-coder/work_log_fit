@@ -8,7 +8,14 @@ class Program extends HiveEntity {
   @HiveField(0)
   final String name;
 
-  Program({required this.name}) : super();
+  @HiveField(1)
+  List<int> exerciseIds;
+
+  Program({
+    required this.name,
+    List<int> exerciseIds = const [],
+  })  : exerciseIds = (exerciseIds.isEmpty) ? [] : List<int>.from(exerciseIds),
+        super();
 
   @override
   bool useImage() {
