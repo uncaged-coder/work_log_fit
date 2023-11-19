@@ -19,7 +19,6 @@ abstract class BaseListScreen<T> extends StatefulWidget
   bool enableFirstButton; // custom buton
   bool enableDeleteButton;
   bool enableAddButton;
-  bool showTimer;
 
   BaseListScreen({
     required this.title,
@@ -32,7 +31,6 @@ abstract class BaseListScreen<T> extends StatefulWidget
     this.enableDeleteButton = true,
     this.enableAddButton = true,
     this.enableFirstButton = true,
-    this.showTimer = false,
   });
 
   @override
@@ -222,17 +220,6 @@ abstract class BaseListScreenState<T extends HiveEntity>
     }
   }
 
-  void _toggleTimer() {
-    if (timerManager.isTimerRunning) {
-      timerManager.stopTimer();
-    } else {
-      timerManager.startTimer(onTick: () => setState(() {}));
-    }
-
-    // Force the widget to rebuild and update the UI
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     Color backgroundColor = Theme.of(context).scaffoldBackgroundColor;
@@ -246,31 +233,13 @@ abstract class BaseListScreenState<T extends HiveEntity>
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            if (widget.titleIcon != '') ...[
+            if (widget.titleIcon.isNotEmpty) ...[
               printImage(widget.titleIcon),
+              SizedBox(width: 8), // Adjust the width as needed
             ],
             Text(widget.title, style: TextStyle(color: themeColor2)),
-            if (widget.showTimer) ...[
-              Row(
-                children: [
-                  Text(
-                    formatTime(timerManager.remainingSeconds),
-                    style: TextStyle(
-                      fontFamily: 'DigitalDisplay',
-                      color: Colors.red,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(timerManager.isTimerRunning
-                        ? Icons.stop
-                        : Icons.play_arrow),
-                    onPressed: _toggleTimer,
-                  ),
-                ],
-              ),
-            ],
           ],
         ),
       ),

@@ -13,7 +13,7 @@ class ProgramShowScreen extends BaseListScreen<Exercise> {
 
   ProgramShowScreen({required this.program})
       : super(
-          title: '${program.name} program',
+          title: '${program.name}',
           boxName: 'programs',
           boxItemsName: 'exercises',
           emptyList: 'No exercises available - please add a new exercise.',

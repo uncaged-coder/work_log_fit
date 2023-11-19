@@ -13,13 +13,12 @@ class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
 
   ExerciseLogScreen({required this.exercise, required this.programId})
       : super(
-          title: '${exercise.name} log',
+          title: '${exercise.name}',
           titleIcon: exercise.getImageIcon(),
           boxItemsName: 'workLog',
           emptyList: 'No logs available - please add a new log.',
           button1Name: 'Stats',
           button1Icon: 'Monitoring',
-          showTimer: true,
         );
 
   @override
@@ -124,71 +123,125 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
     return sortedDates;
   }
 
+  void _toggleTimer() {
+    if (timerManager.isTimerRunning) {
+      timerManager.stopTimer();
+    } else {
+      timerManager.startTimer(onTick: () => setState(() {}));
+    }
+
+    // Force the widget to rebuild and update the UI
+    setState(() {});
+  }
+
   @override
   List<Widget> buildItemList(BuildContext context) {
-    // Check if there are any work logs to display
     if (baseItemsList.isEmpty) {
-      // Return an empty list containing just a placeholder widget
       return [Center(child: Text('No logs available'))];
     }
 
-    // Group logs by date
     Map<DateTime, List<WorkLogEntry>> groupedLogs = _groupLogsByDate();
-
-    // Convert the map into a sorted list of dates
     List<DateTime> sortedDates = _sortDates(groupedLogs);
 
-    // Flatten the grouped logs into a single list of widgets
     List<Widget> listItems = [];
+    bool isFirstDate = true;
+
     for (DateTime date in sortedDates) {
-      // Add date header with styling
-      listItems.add(
-        Container(
-          color: themeColor,
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
+      Widget dateHeader = isFirstDate
+          ? _buildDateHeaderWithTimer(context, date)
+          : _buildDateHeaderWithoutTimer(context, date);
+      isFirstDate = false;
+
+      listItems.add(dateHeader);
+      listItems.addAll(_buildLogEntries(groupedLogs[date]!));
+    }
+
+    return listItems;
+  }
+
+  Widget _buildDateHeaderWithTimer(BuildContext context, DateTime date) {
+    return Container(
+      color: themeColor,
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
             DateFormat('yyyy/MM/dd').format(date),
             style: Theme.of(context).textTheme.headline6?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
           ),
-        ),
-      );
-      // Add log entries for this date
-      List<Widget> logEntries = groupedLogs[date]!
-          .map((log) => ListTile(
-                title: RichText(
-                  text: TextSpan(
-                    style: Theme.of(context).textTheme.bodyText1,
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: '${log.repetitions} ',
-                          style: TextStyle(color: themeColor2)),
-                      const TextSpan(text: 'x '),
-                      TextSpan(
-                          text: '${log.weight} ',
-                          style: TextStyle(color: themeColor2)),
-                      const TextSpan(text: 'kg'),
-                    ],
-                  ),
-                ),
-                trailing: showDelete
-                    ? IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () => deleteItem(log),
-                      )
-                    : null,
-                onTap: () {
-                  if (!showDelete) {
-                    itemSelected(context, log);
-                  }
-                },
-              ))
-          .toList();
-      listItems.addAll(logEntries);
-    }
+          _buildTimerRow(),
+        ],
+      ),
+    );
+  }
 
-    return listItems;
+  Widget _buildDateHeaderWithoutTimer(BuildContext context, DateTime date) {
+    return Container(
+      color: themeColor,
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        DateFormat('yyyy/MM/dd').format(date),
+        style: Theme.of(context).textTheme.headline6?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+      ),
+    );
+  }
+
+  Widget _buildTimerRow() {
+    return Row(
+      children: [
+        Text(
+          formatTime(timerManager.remainingSeconds),
+          style: TextStyle(
+            fontFamily: 'DigitalDisplay',
+            color: Colors.red,
+          ),
+        ),
+        IconButton(
+          icon:
+              Icon(timerManager.isTimerRunning ? Icons.stop : Icons.play_arrow),
+          onPressed: _toggleTimer,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildLogEntries(List<WorkLogEntry> logEntries) {
+    return logEntries
+        .map((log) => ListTile(
+              title: RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.bodyText1,
+                  children: <TextSpan>[
+                    TextSpan(
+                        text: '${log.repetitions} ',
+                        style: TextStyle(color: themeColor2)),
+                    const TextSpan(text: 'x '),
+                    TextSpan(
+                        text: '${log.weight} ',
+                        style: TextStyle(color: themeColor2)),
+                    const TextSpan(text: 'kg'),
+                  ],
+                ),
+              ),
+              trailing: showDelete
+                  ? IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => deleteItem(log),
+                    )
+                  : null,
+              onTap: () {
+                if (!showDelete) {
+                  itemSelected(context, log);
+                }
+              },
+            ))
+        .toList();
   }
 }
