@@ -44,6 +44,7 @@ class HiveManager {
     } else {
       // For other platforms, use the path provided by path_provider
       final appDocumentDir = await getApplicationDocumentsDirectory();
+      print("App Document Directory: ${appDocumentDir.path}");
       Hive.init(appDocumentDir.path);
     }
 
