@@ -110,6 +110,9 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
   }
 
   Map<DateTime, List<WorkLogEntry>> _groupLogsByDate() {
+    // Clear the cache to prevent duplicates
+    groupedLogsCache.clear();
+
     for (var log in baseItemsList) {
       final date = DateTime(
           log.date.year, log.date.month, log.date.day); // Strip time from date
