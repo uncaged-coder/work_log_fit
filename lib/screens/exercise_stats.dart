@@ -18,6 +18,7 @@ class ExerciseStatsChart extends StatelessWidget {
 
     return SideTitles(
       showTitles: true,
+      reservedSize: 30,
       getTitlesWidget: (double value, TitleMeta meta) {
         // FIXME: ugly: because of our ugly work arround (implemented because of inverted data.
         // See more info below, search for ugly) we did lost date in case of not summed stats.
@@ -50,6 +51,7 @@ class ExerciseStatsChart extends StatelessWidget {
 
     return SideTitles(
       showTitles: true,
+      reservedSize: 40,
       getTitlesWidget: (double value, TitleMeta meta) {
         Widget title;
         if (value == firstY || value == middleY || value == lastY) {
@@ -61,7 +63,7 @@ class ExerciseStatsChart extends StatelessWidget {
         return SideTitleWidget(
           axisSide: meta.axisSide,
           fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
-          angle: -90,
+          angle: -0.5,
           child: title,
         );
       },
@@ -88,9 +90,9 @@ class ExerciseStatsChart extends StatelessWidget {
   LineChartBarData mainData() {
     return LineChartBarData(
       spots: spots,
-      isCurved: true,
-      barWidth: 5,
-      isStrokeCapRound: true,
+      isCurved: false,
+      barWidth: 2,
+      isStrokeCapRound: false,
       dotData: FlDotData(show: true),
       belowBarData: BarAreaData(show: false),
     );

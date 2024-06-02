@@ -12,6 +12,8 @@
 .svn/
 migrate_working_dir/
 tmp/
+private/
+.echogit/
 
 # IntelliJ related
 *.iml
