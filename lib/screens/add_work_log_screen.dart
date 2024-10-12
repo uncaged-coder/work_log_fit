@@ -87,7 +87,7 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
           onPressed: () => deleteNumber(type),
           child: Icon(Icons.backspace, size: 24),
           style: ElevatedButton.styleFrom(
-            primary: themeRed, // Background color
+            backgroundColor: themeRed, // Background color
             minimumSize: Size(double.infinity, double.infinity),
           ),
         ),
@@ -184,7 +184,7 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                         style: TextStyle(fontSize: 24, color: Colors.white)),
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // Cancel button color
+                    backgroundColor: Colors.red, // Cancel button color
                   ),
                 ),
                 ElevatedButton(
@@ -215,7 +215,7 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                         style: TextStyle(fontSize: 24, color: Colors.white)),
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: themeColor, // Save button color
+                    backgroundColor: themeColor, // Save button color
                   ),
                 ),
               ],

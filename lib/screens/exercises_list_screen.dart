@@ -52,7 +52,7 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             category,
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
         ),
       );

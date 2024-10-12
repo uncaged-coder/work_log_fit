@@ -172,7 +172,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
         children: [
           Text(
             DateFormat('yyyy/MM/dd').format(date),
-            style: Theme.of(context).textTheme.headline6?.copyWith(
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -189,7 +189,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
       padding: const EdgeInsets.all(8.0),
       child: Text(
         DateFormat('yyyy/MM/dd').format(date),
-        style: Theme.of(context).textTheme.headline6?.copyWith(
+        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -221,7 +221,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
         .map((log) => ListTile(
               title: RichText(
                 text: TextSpan(
-                  style: Theme.of(context).textTheme.bodyText1,
+                  style: Theme.of(context).textTheme.bodyLarge,
                   children: <TextSpan>[
                     TextSpan(
                         text: '${log.repetitions} ',
