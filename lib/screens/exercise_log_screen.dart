@@ -251,10 +251,11 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
 
   @override
   void showCustomItemDialog(BuildContext context) {
+    List<WorkLogEntry> flattenedLogs = groupedLogsCache.values.expand((logs) => logs).toList();
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatsDialog(groupedLogsCache);
+        return StatsDialog(flattenedLogs);
       },
     );
   }

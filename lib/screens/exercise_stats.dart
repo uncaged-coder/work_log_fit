@@ -6,72 +6,75 @@ import 'package:work_log_fit/models/work_log_entry.dart';
 
 class ExerciseStatsChart extends StatelessWidget {
   final List<FlSpot> spots;
-  final Map<DateTime, List<WorkLogEntry>> groupedLogs;
+  final List<DateTime> dates;
 
-  ExerciseStatsChart(this.spots, this.groupedLogs);
+  ExerciseStatsChart(this.spots, this.dates, {Key? key}) : super(key: key);  // Added key here
 
+  // This simplified version focuses only on showing the first and last date.
   SideTitles getBottomTitles() {
     final dateFormat = DateFormat('yy/MM/dd');
-    final middleXIndex = spots.length ~/ 2;
-    final firstX = spots.first.x;
-    final lastX = spots.last.x;
+    if (spots.isEmpty) {
+      return SideTitles(showTitles: false);
+    }
 
     return SideTitles(
       showTitles: true,
       reservedSize: 30,
       getTitlesWidget: (double value, TitleMeta meta) {
-        // FIXME: ugly: because of our ugly work arround (implemented because of inverted data.
-        // See more info below, search for ugly) we did lost date in case of not summed stats.
-        // Since we only need first and last one, we are getting them directly from grouppedLogs
-        // map structure.
-        DateTime date =
-            (value == firstX) ? groupedLogs.keys.first : groupedLogs.keys.last;
-        Widget title;
-        if (value == firstX || value == lastX) {
-          String formattedDate = dateFormat.format(date);
-          title = Text(formattedDate, textAlign: TextAlign.left);
+        String formattedDate;
+        if (value == 0) {
+          formattedDate = dateFormat.format(dates.last);
+        } else if (value == spots.length - 1) {
+          formattedDate = dateFormat.format(dates.first);
         } else {
-          title = const SizedBox.shrink(); // No title
+          return const SizedBox.shrink(); // Do not show other dates
         }
 
         return SideTitleWidget(
           axisSide: meta.axisSide,
           fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
-          child: title,
+          child: Text(formattedDate, textAlign: TextAlign.left),
         );
       },
     );
   }
 
-  // Function to generate left titles (y-axis)
   SideTitles getLeftTitles() {
-    double firstY = spots.map((e) => e.y).reduce(min);
-    double lastY = spots.map((e) => e.y).reduce(max);
-    double middleY = (firstY + lastY) / 2;
+    if (spots.isEmpty) {
+      return SideTitles(showTitles: false);
+    }
+    double minY = spots.map((e) => e.y).reduce(min);
+    double maxY = spots.map((e) => e.y).reduce(max);
+    double midY = (minY + maxY) / 2;
 
     return SideTitles(
       showTitles: true,
       reservedSize: 40,
       getTitlesWidget: (double value, TitleMeta meta) {
-        Widget title;
-        if (value == firstY || value == middleY || value == lastY) {
-          title = Text(value.toInt().toString());
+        if (value == minY || value == midY || value == maxY) {
+          return SideTitleWidget(
+            axisSide: meta.axisSide,
+            fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
+            child: Text(value.toInt().toString()),
+          );
         } else {
-          title = const SizedBox.shrink(); // No title
+          return const SizedBox.shrink();
         }
-
-        return SideTitleWidget(
-          axisSide: meta.axisSide,
-          fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
-          angle: -0.5,
-          child: title,
-        );
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (spots.isEmpty) {
+      return Center(
+        child: Text(
+          'No data available for the selected period.',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(show: true),
@@ -100,9 +103,9 @@ class ExerciseStatsChart extends StatelessWidget {
 }
 
 class StatsDialog extends StatefulWidget {
-  final Map<DateTime, List<WorkLogEntry>> groupedLogs;
+  final List<WorkLogEntry> logs;
 
-  StatsDialog(this.groupedLogs);
+  StatsDialog(this.logs);
 
   @override
   _StatsDialogState createState() => _StatsDialogState();
@@ -111,12 +114,8 @@ class StatsDialog extends StatefulWidget {
 class _StatsDialogState extends State<StatsDialog> {
   late GraphType selectedGraphType;
   List<GraphType> graphTypes = [
-    GraphType("Sum - All", (logs) => processWeightData(logs, true)),
-    GraphType("Sum - 1 Month",
-        (logs) => processWeightData(filterLogsForPastMonth(logs), true)),
-    GraphType("Weight - All", (logs) => processWeightData(logs, false)),
-    GraphType("Weight - 1 Month",
-        (logs) => processWeightData(filterLogsForPastMonth(logs), false)),
+    GraphType("Reccent progress", (logs) => processLastTenData(logs)),
+    GraphType("Full history", (logs) => processWeightData(logs)),
   ];
 
   @override
@@ -127,7 +126,8 @@ class _StatsDialogState extends State<StatsDialog> {
 
   @override
   Widget build(BuildContext context) {
-    List<FlSpot> spots = selectedGraphType.filterFunction(widget.groupedLogs);
+    List<FlSpot> spots = selectedGraphType.filterFunction(widget.logs);
+    List<DateTime> dates = widget.logs.map((log) => log.date).toList();
 
     return AlertDialog(
       title: Text('Exercise Statistics'),
@@ -145,8 +145,7 @@ class _StatsDialogState extends State<StatsDialog> {
                   });
                 }
               },
-              items:
-                  graphTypes.map<DropdownMenuItem<GraphType>>((GraphType type) {
+              items: graphTypes.map<DropdownMenuItem<GraphType>>((GraphType type) {
                 return DropdownMenuItem<GraphType>(
                   value: type,
                   child: Text(type.name),
@@ -154,7 +153,8 @@ class _StatsDialogState extends State<StatsDialog> {
               }).toList(),
             ),
             Expanded(
-              child: ExerciseStatsChart(spots, widget.groupedLogs),
+              // Pass a unique key to ensure the chart rebuilds properly when switching graph types
+              child: ExerciseStatsChart(spots, dates, key: ValueKey(selectedGraphType)),
             ),
           ],
         ),
@@ -171,46 +171,25 @@ class _StatsDialogState extends State<StatsDialog> {
   }
 }
 
-// Utility function to filter logs for the past month
-Map<DateTime, List<WorkLogEntry>> filterLogsForPastMonth(
-    Map<DateTime, List<WorkLogEntry>> logs) {
-  DateTime oneMonthAgo = DateTime.now().subtract(Duration(days: 30));
-  return Map.fromEntries(
-      logs.entries.where((entry) => entry.key.isAfter(oneMonthAgo)));
+List<FlSpot> processLastTenData(List<WorkLogEntry> logs) {
+  // Handle the case where there are fewer than 10 data points
+  final lastTenLogs = logs.length > 10 ? logs.sublist(0, 9) : logs;
+  return processWeightData(lastTenLogs);
 }
 
-// Utility function to process weight data for logs
-List<FlSpot> processWeightData(
-    Map<DateTime, List<WorkLogEntry>> logs, bool sumWeights) {
+List<FlSpot> processWeightData(List<WorkLogEntry> logs) {
   List<FlSpot> spots = [];
 
-  // FIXME: this is very ugly ;)
-  // because all data are inverted, and to avoid playing with temporary list which
-  // would be CPU wast, and because I'm too lazy to rewrite the code, I had to use
-  // this ugly work arround.
-  // so by decreasing x for each point, we will get our chart as we want.
-  double x = 1000000;
-
-  logs.forEach((date, entries) {
-    if (sumWeights) {
-      // If summing weights, use the date for the x-coordinate
-      double totalWeight =
-          entries.fold(0.0, (sum, entry) => sum + entry.weight.toDouble());
-      spots.add(FlSpot(date.millisecondsSinceEpoch.toDouble(), totalWeight));
-    } else {
-      // If not summing, increment x for each log entry
-      for (var entry in entries) {
-        x--;
-        spots.add(FlSpot(x, entry.weight.toDouble()));
-      }
-    }
-  });
+  for (int i = 0; i < logs.length; i++) {
+    double x = logs.length - 1 - i.toDouble();
+    spots.add(FlSpot(x, logs[i].weight.toDouble()));
+  }
   return spots;
 }
 
 class GraphType {
   final String name;
-  final Function(Map<DateTime, List<WorkLogEntry>>) filterFunction;
+  final Function(List<WorkLogEntry>) filterFunction;
 
   GraphType(this.name, this.filterFunction);
 }
