@@ -40,7 +40,6 @@ macos/
 windows/
 linux/
 ios/
-android/
 web/
 *.g.dart
 
