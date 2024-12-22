@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:work_log_fit/models/program.dart';
+import 'package:work_log_fit/screens/settings_screen.dart';
 import 'program_show_screen.dart';
 import 'list_screen_base.dart';
 
@@ -36,4 +37,15 @@ class _ProgramsListScreenState extends BaseListScreenState<Program> {
       ),
     );
   }
+
+  @override
+  void showCustomItemDialog(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SettingsScreen(),
+          ),
+        );
+  }
+
 }

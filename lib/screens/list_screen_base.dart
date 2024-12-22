@@ -6,6 +6,7 @@ import 'package:work_log_fit/models/hive_entity.dart';
 import 'package:work_log_fit/timer.dart';
 import 'package:work_log_fit/settings.dart';
 import 'package:work_log_fit/hive_manager.dart';
+import 'package:work_log_fit/screens/settings_screen.dart';
 
 abstract class BaseListScreen<T> extends StatefulWidget
     implements PreferredSizeWidget {
@@ -128,7 +129,8 @@ abstract class BaseListScreenState<T extends HiveEntity>
   }
 
   @override
-  void showCustomItemDialog(BuildContext context) {}
+  void showCustomItemDialog(BuildContext context) {
+  }
 
   @override
   void showAddItemDialog(BuildContext context) {
@@ -280,7 +282,6 @@ abstract class BaseListScreenState<T extends HiveEntity>
             // Show add dialog
             showAddItemDialog(context);
           } else if (index == customIndex) {
-            // Not implemtented
             showCustomItemDialog(context);
           }
         },
