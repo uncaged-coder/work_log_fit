@@ -5,7 +5,7 @@ import 'program_show_screen.dart';
 import 'list_screen_base.dart';
 
 class ProgramsListScreen extends BaseListScreen<Program> {
-  ProgramsListScreen()
+  ProgramsListScreen({super.key})
       : super(
           title: 'Work Log Fit - Programs',
           boxName: null,
@@ -20,7 +20,7 @@ class ProgramsListScreen extends BaseListScreen<Program> {
 class _ProgramsListScreenState extends BaseListScreenState<Program> {
   @override
   Program? createItem(String name) {
-    return new Program(name: name);
+    return Program(name: name);
   }
 
   @override

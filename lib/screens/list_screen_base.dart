@@ -6,7 +6,6 @@ import 'package:work_log_fit/models/hive_entity.dart';
 import 'package:work_log_fit/timer.dart';
 import 'package:work_log_fit/settings.dart';
 import 'package:work_log_fit/hive_manager.dart';
-import 'package:work_log_fit/screens/settings_screen.dart';
 
 abstract class BaseListScreen<T> extends StatefulWidget
     implements PreferredSizeWidget {
@@ -21,11 +20,11 @@ abstract class BaseListScreen<T> extends StatefulWidget
   bool enableDeleteButton;
   bool enableAddButton;
 
-  BaseListScreen({
+  BaseListScreen({super.key, 
     required this.title,
     required this.boxItemsName,
     required this.emptyList,
-    this.boxName = null,
+    this.boxName,
     this.titleIcon = '',
     this.button1Name = 'Settings',
     this.button1Icon = 'Settings',
@@ -73,7 +72,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
     baseItemsList = await loadItems(baseItemsBox);
 
     if (widget.boxName != null) {
-      baseBox = await HiveManager().getDataBox(widget.boxName!);
+      baseBox = HiveManager().getDataBox(widget.boxName!);
     } else {
       baseBox = null;
     }
@@ -86,7 +85,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
     return box.values.cast<T>().toList().reversed.toList();
   }
 
-  void saveItem(T item, {dynamic key = null}) async {
+  void saveItem(T item, {dynamic key}) async {
     baseItemsBox = HiveManager().getDataBox(widget.boxItemsName);
 
     if (key != null) {
@@ -134,7 +133,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
 
   @override
   void showAddItemDialog(BuildContext context) {
-    TextEditingController _textFieldController = TextEditingController();
+    TextEditingController textFieldController = TextEditingController();
 
     showDialog(
       context: context,
@@ -142,7 +141,7 @@ abstract class BaseListScreenState<T extends HiveEntity>
         return AlertDialog(
           title: Text('Add New Program'),
           content: TextField(
-            controller: _textFieldController,
+            controller: textFieldController,
             decoration: InputDecoration(hintText: "Program Name"),
           ),
           actions: <Widget>[
@@ -155,8 +154,8 @@ abstract class BaseListScreenState<T extends HiveEntity>
             TextButton(
               child: Text('ADD'),
               onPressed: () {
-                if (_textFieldController.text.isNotEmpty) {
-                  T? item = createItem(_textFieldController.text);
+                if (textFieldController.text.isNotEmpty) {
+                  T? item = createItem(textFieldController.text);
                   if (item != null) {
                     addItem(item);
                     saveItem(item);

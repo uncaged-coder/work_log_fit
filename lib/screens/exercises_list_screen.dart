@@ -8,7 +8,7 @@ import 'list_screen_base.dart';
 class ExerciseListScreen extends BaseListScreen<Exercise> {
   bool customMode;
 
-  ExerciseListScreen({this.customMode = false})
+  ExerciseListScreen({super.key, this.customMode = false})
       : super(
           title: 'Work Log Fit - Exercices',
           boxItemsName: 'exercises',
@@ -129,7 +129,7 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
 
   @override
   void showAddItemDialog(BuildContext context) {
-    TextEditingController _exerciseNameController = TextEditingController();
+    TextEditingController exerciseNameController = TextEditingController();
 
     // List of muscle group names
     List<String> muscleGroupNames = [
@@ -143,7 +143,7 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
       MuscleGroups.other,
     ];
 
-    String? _selectedMuscleGroup = muscleGroupNames.first;
+    String? selectedMuscleGroup = muscleGroupNames.first;
 
     showDialog(
       context: context,
@@ -163,10 +163,10 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
                     flex: 3,
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      value: _selectedMuscleGroup,
+                      value: selectedMuscleGroup,
                       onChanged: (String? newValue) {
                         setState(() {
-                          _selectedMuscleGroup = newValue;
+                          selectedMuscleGroup = newValue;
                         });
                       },
                       items: muscleGroupNames
@@ -181,7 +181,7 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
                 ],
               ),
               TextField(
-                controller: _exerciseNameController,
+                controller: exerciseNameController,
                 decoration: InputDecoration(hintText: "Exercise Name"),
               ),
             ],
@@ -196,16 +196,16 @@ class _ExerciseListScreenState extends BaseListScreenState<Exercise> {
             TextButton(
               child: Text('ADD'),
               onPressed: () {
-                if (_exerciseNameController.text.isNotEmpty &&
-                    _selectedMuscleGroup != null) {
+                if (exerciseNameController.text.isNotEmpty &&
+                    selectedMuscleGroup != null) {
                   // Find the current max ID in the box, starting from customExerciseStartId
                   int newId = baseItemsBox.keys.fold<int>(customExerciseStartId,
                           (max, current) => current > max ? current : max) +
                       1;
 
                   Exercise newItem = Exercise(
-                    name: _exerciseNameController.text,
-                    muscleGroup: _selectedMuscleGroup!,
+                    name: exerciseNameController.text,
+                    muscleGroup: selectedMuscleGroup!,
                   );
                   addItem(newItem);
                   saveItem(newItem, key: newId);

@@ -8,8 +8,8 @@ class AddWorkLogScreen extends StatefulWidget {
   final programId;
   final bool update;
 
-  AddWorkLogScreen(
-      {this.existingEntry,
+  const AddWorkLogScreen(
+      {super.key, this.existingEntry,
       required this.exerciseId,
       this.programId,
       this.update = false});
@@ -25,6 +25,7 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
 
   _AddWorkLogScreenState();
 
+  @override
   void initState() {
     super.initState();
     weight = widget.existingEntry?.weight.toString() ?? '0';
@@ -70,10 +71,10 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
         padding: const EdgeInsets.all(2.0),
         child: ElevatedButton(
           onPressed: () => addNumber(number, type),
-          child: Text(number, style: TextStyle(fontSize: 24)),
           style: ElevatedButton.styleFrom(
             minimumSize: Size(double.infinity, double.infinity),
           ),
+          child: Text(number, style: TextStyle(fontSize: 24)),
         ),
       ),
     );
@@ -85,11 +86,11 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
         padding: const EdgeInsets.all(2.0),
         child: ElevatedButton(
           onPressed: () => deleteNumber(type),
-          child: Icon(Icons.backspace, size: 24),
           style: ElevatedButton.styleFrom(
             backgroundColor: themeRed, // Background color
             minimumSize: Size(double.infinity, double.infinity),
           ),
+          child: Icon(Icons.backspace, size: 24),
         ),
       ),
     );
@@ -177,14 +178,14 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                     // Simply pop the screen without saving anything
                     Navigator.pop(context);
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, // Cancel button color
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 15.0, horizontal: 30.0),
                     child: Text('Cancel',
                         style: TextStyle(fontSize: 24, color: Colors.white)),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Cancel button color
                   ),
                 ),
                 ElevatedButton(
@@ -208,14 +209,14 @@ class _AddWorkLogScreenState extends State<AddWorkLogScreen> {
                     }
                     Navigator.pop(context, workLog);
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: themeColor, // Save button color
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 15.0, horizontal: 30.0),
                     child: Text(saveText,
                         style: TextStyle(fontSize: 24, color: Colors.white)),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: themeColor, // Save button color
                   ),
                 ),
               ],

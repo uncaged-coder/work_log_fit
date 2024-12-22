@@ -20,6 +20,6 @@ class HiveEntity extends HiveObject {
 
   void remove() async {
     var box = HiveManager().getDataBox(baseName);
-    box.delete(this.key);
+    box.delete(key);
   }
 }

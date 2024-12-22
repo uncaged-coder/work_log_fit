@@ -11,9 +11,9 @@ import 'exercises_list_screen.dart';
 class ProgramShowScreen extends BaseListScreen<Exercise> {
   final Program program; // parent
 
-  ProgramShowScreen({required this.program})
+  ProgramShowScreen({super.key, required this.program})
       : super(
-          title: '${program.name}',
+          title: program.name,
           boxName: 'programs',
           boxItemsName: 'exercises',
           emptyList: 'No exercises available - please add a new exercise.',

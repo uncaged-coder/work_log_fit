@@ -12,9 +12,9 @@ class ExerciseLogScreen extends BaseListScreen<WorkLogEntry> {
   final Exercise exercise;
   final int programId;
 
-  ExerciseLogScreen({required this.exercise, required this.programId})
+  ExerciseLogScreen({super.key, required this.exercise, required this.programId})
       : super(
-          title: '${exercise.name}',
+          title: exercise.name,
           titleIcon: exercise.getImageIcon(),
           boxItemsName: 'workLog',
           emptyList: 'No logs available - please add a new log.',
@@ -31,6 +31,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
   final Map<DateTime, List<WorkLogEntry>> groupedLogsCache = {};
   final Exercise exercise; // parent
   final int programId;
+  @override
   bool showDelete = false;
   WorkLogEntry? _lastLog;
 
@@ -44,7 +45,7 @@ class _ExerciseLogScreenState extends BaseListScreenState<WorkLogEntry> {
   @override
   Future<List<WorkLogEntry>> loadItems(Box<dynamic> box) async {
     // Obtain the log asynchronously
-    var logs = await box.values
+    var logs = box.values
         .cast<WorkLogEntry>()
         .where((log) =>
             log.exerciseId == exercise.getId() && log.programId == programId)

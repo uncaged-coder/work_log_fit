@@ -58,6 +58,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+  project: any
 flutter_icons:
   android: true
   ios: true

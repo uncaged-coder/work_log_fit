@@ -2,7 +2,6 @@ import 'package:hive/hive.dart';
 import 'package:work_log_fit/hive_manager.dart';
 import 'hive_type_ids.dart';
 import 'hive_entity.dart';
-import 'work_log_entry.dart';
 part 'program.g.dart';
 
 @HiveType(typeId: HiveTypeIds.program)
@@ -32,14 +31,14 @@ class Program extends HiveEntity {
   void removeExercise(int exerciseId) async {
     exerciseIds.remove(exerciseId);
     var box = HiveManager().programsBox;
-    box.put(this.key, this);
+    box.put(key, this);
   }
 
   @override
   void remove() async {
     var box = HiveManager().worklogBox;
     box.values
-        .where((workLog) => workLog.programId == this.key)
+        .where((workLog) => workLog.programId == key)
         .toList()
         .forEach((workLog) {
       box.delete(workLog.key);

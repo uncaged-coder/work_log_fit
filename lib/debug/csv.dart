@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:csv/csv.dart';
-import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/work_log_entry.dart';
 import 'package:work_log_fit/models/program.dart';
 import 'package:work_log_fit/exercises_manager.dart';

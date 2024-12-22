@@ -1,4 +1,3 @@
-import 'dart:io' show Platform, Directory;
 import 'package:hive/hive.dart';
 import 'package:work_log_fit/models/exercise.dart';
 import 'package:work_log_fit/models/program.dart';

@@ -28,8 +28,4 @@ class WorkLogEntry extends HiveEntity {
       required this.exerciseId})
       : super(baseName: 'workLog');
 
-  @override
-  void remove() {
-    super.remove();
-  }
 }

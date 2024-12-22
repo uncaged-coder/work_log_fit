@@ -8,7 +8,7 @@ class ExerciseStatsChart extends StatelessWidget {
   final List<FlSpot> spots;
   final List<DateTime> dates;
 
-  ExerciseStatsChart(this.spots, this.dates, {Key? key}) : super(key: key);  // Added key here
+  const ExerciseStatsChart(this.spots, this.dates, {super.key});  // Added key here
 
   // This simplified version focuses only on showing the first and last date.
   SideTitles getBottomTitles() {
@@ -105,7 +105,7 @@ class ExerciseStatsChart extends StatelessWidget {
 class StatsDialog extends StatefulWidget {
   final List<WorkLogEntry> logs;
 
-  StatsDialog(this.logs);
+  const StatsDialog(this.logs, {super.key});
 
   @override
   _StatsDialogState createState() => _StatsDialogState();
@@ -131,7 +131,7 @@ class _StatsDialogState extends State<StatsDialog> {
 
     return AlertDialog(
       title: Text('Exercise Statistics'),
-      content: Container(
+      content: SizedBox(
         height: 400,
         width: double.maxFinite,
         child: Column(

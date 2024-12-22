@@ -2,14 +2,10 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:csv/csv.dart';
-import 'package:intl/intl.dart';
 import 'package:work_log_fit/hive_manager.dart';
 import 'package:work_log_fit/models/work_log_entry.dart';
 import 'package:work_log_fit/models/program.dart';
-import 'package:work_log_fit/models/exercise.dart';
-import 'package:work_log_fit/models/hive_entity.dart';
 //import 'old_mappings.dart'; // for mwlcsv imports only
-import 'package:work_log_fit/exercises_manager.dart';
 
 class DataSyncManager {
   final HiveManager hiveManager = HiveManager();

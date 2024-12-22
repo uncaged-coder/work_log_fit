@@ -1,10 +1,7 @@
 import 'package:hive/hive.dart';
-import 'package:work_log_fit/settings.dart';
 import 'package:work_log_fit/hive_manager.dart';
 import 'hive_type_ids.dart';
 import 'hive_entity.dart';
-import 'work_log_entry.dart';
-import 'program.dart';
 part 'exercise.g.dart';
 
 @HiveType(typeId: HiveTypeIds.exercise)
@@ -24,7 +21,7 @@ class Exercise extends HiveEntity {
     required this.name,
     required this.muscleGroup,
     this.image = '',
-    this.pkey = null,
+    this.pkey,
   }) : super(baseName: 'exercises');
 
   @override
@@ -62,7 +59,7 @@ class Exercise extends HiveEntity {
     box.values
         .where((workLog) =>
             workLog.programId == programId &&
-            workLog.exerciseId == this.getId())
+            workLog.exerciseId == getId())
         .toList()
         .forEach((workLog) {
       box.delete(workLog.key);
